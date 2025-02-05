@@ -1,0 +1,23 @@
+{
+  "name": "user-service",
+  "version": "1.0.0",
+  "description": "User Service",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "nodemon index.js"
+  },
+  "author": "Sagar Shirgaonkar",
+  "license": "ISC",
+  "dependencies": {
+    "@grpc/grpc-js": "^1.12.6",
+    "@grpc/proto-loader": "^0.7.13",
+    "bcryptjs": "^2.4.3",
+    "dotenv": "^16.4.7",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.9.7"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.9"
+  }
+}
