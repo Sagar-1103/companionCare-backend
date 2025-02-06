@@ -9,6 +9,11 @@ const chatSchema = new Schema({
         type:String,
         required:true,
     },
+    messageType: {
+        type: String,
+        enum: ["text", "image"],
+        required: true,
+    },
     message:{
         type:String,
         required:true,

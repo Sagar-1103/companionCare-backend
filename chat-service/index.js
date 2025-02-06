@@ -7,6 +7,8 @@ import { WebSocketServer } from "ws";
 import {createServer} from "node:http";
 import { Chat } from "./src/models/chat.model.js";
 import dotenv from "dotenv";
+import { connectCloudinary } from "./src/config/cloudinary.config.js";
+import { v2 as cloudinary } from "cloudinary";
 dotenv.config();
 
 const PROTO_PATH = "./protos/chat.proto";
@@ -57,11 +59,27 @@ wss.on('connection', (ws) => {
         return;
       }
       if (connections[data.roomId]) {
-        await Chat.create({senderId:data.senderId,roomId:data.roomId,message:data.message})
+        let messageContent = data.message;
+        const messageType = data.messageType;
+        if(messageType === "image"){
+          try {
+            const uploadResponse = await cloudinary.uploader.upload(`${data.image}`, {
+              folder: "chat_images",
+            });
+            messageContent = uploadResponse.secure_url;
+          } catch (error) {
+            console.error("Cloudinary Upload Failed:", error);
+            ws.send(JSON.stringify({ error: "Image upload failed." }));
+            return;
+          }
+        }
+
+        await Chat.create({senderId:data.senderId,roomId:data.roomId,message:messageContent,messageType})
         connections[data.roomId].forEach(client => {
           client.send(JSON.stringify({
             senderId: data.senderId,
-            message: data.message,
+            message: messageContent,
+            messageType,
             timestamp: new Date().toISOString(),
           }));
         });
@@ -76,6 +94,7 @@ wss.on('connection', (ws) => {
 });
 
 connectDatabase().then(()=>{
+  connectCloudinary();
   socketServer.listen(process.env.SOCKET_PORT,()=>{
     console.log("Web Socket Server is listening on port 8080");
 })

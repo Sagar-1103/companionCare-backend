@@ -22,6 +22,7 @@ message ChatMessage {
   string roomId = 3;
   string message = 4;
   string createdAt = 5;
+  string messageType = 6;
 }
 
 message GetChatsRequest {
