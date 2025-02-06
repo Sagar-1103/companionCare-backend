@@ -1,7 +1,7 @@
 import { startGrpcServer, getGrpcServer } from "./grpc.js";
 import protoLoader from "@grpc/proto-loader";
 import grpc from "@grpc/grpc-js";
-import {createUser} from "./src/app.js";
+import {createToken, createUser, getCurrentUser, logoutUser} from "./src/app.js";
 
 const PROTO_PATH = "./protos/user.proto";
 
@@ -18,5 +18,8 @@ startGrpcServer();
 const server = getGrpcServer();
 
 server.addService(user_proto.UserService.service, {
-  createUser
+  createUser,
+  createToken,
+  logoutUser,
+  getCurrentUser,
 });

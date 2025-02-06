@@ -3,6 +3,7 @@ import grpc from "@grpc/grpc-js";
 const PROTO_PATH = "./protos/user.proto";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { AsyncHandler } from "../utils/AsyncHandler.js";
+import {GrpcError} from "../utils/GrpcError.js";
 import dotenv from "dotenv";
 dotenv.config();
 
@@ -32,25 +33,13 @@ const registerUser = AsyncHandler(async (req, res) => {
       role
     },
   };
-  client.createUser(createUserRequest, (err, msg) => {
+  client.createUser(createUserRequest, async(err, msg) => {
     if (err) {
-      let httpStatus;
-      switch (err.code) {
-        case grpc.status.INVALID_ARGUMENT:
-          httpStatus = 400;
-          break;
-        case grpc.status.ALREADY_EXISTS:
-          httpStatus = 409;
-          break;
-        case grpc.status.INTERNAL:
-        default:
-          httpStatus = 500;
-          break;
-      }
+      const response = await GrpcError(err);      
       return res
-        .status(httpStatus)
+        .status(response.statusCode)
         .json(
-          new ApiResponse(httpStatus, undefined, err.message.split(": ")[1])
+          new ApiResponse(response.statusCode, undefined,response.message)
         );
     } else {
       return res
@@ -61,16 +50,93 @@ const registerUser = AsyncHandler(async (req, res) => {
 });
 
 const loginUser = AsyncHandler(async(req,res)=>{
+  const { email, password } = req.body;
+  const createTokenRequest = {
+    user: {
+      email,
+      password,
+    },
+  };
+
+  client.createToken(createTokenRequest,async(err,msg)=>{
+    if (err) {
+      const response = await GrpcError(err);      
+      return res
+        .status(response.statusCode)
+        .json(
+          new ApiResponse(response.statusCode, undefined,response.message)
+        );
+    } else {
+      const options = {
+        httpOnly: true,
+        secure: true
+      };
+      return res
+        .cookie('accessToken', msg.accessToken, options)
+        .cookie('refreshToken', msg.refreshToken, options)
+        .status(200)
+        .json(new ApiResponse(200, { user: msg.user,accessToken:msg.accessToken,refreshToken:msg.refreshToken }, msg.message));
+    }
+  });
 
 })
-const loginPatient = AsyncHandler(async(req,res)=>{
 
+const registerPatient = AsyncHandler(async(req,res)=>{
+
+})
+
+const loginPatient = AsyncHandler(async(req,res)=>{
+  
 })
 const logoutUser = AsyncHandler(async(req,res)=>{
-
+  const {id} = req.body;
+  const logoutUserRequest = {
+    user: {
+      id
+    },
+  };
+  client.logoutUser(logoutUserRequest,async(err,msg)=>{
+    if(err){
+      const response = await GrpcError(err);      
+      return res
+        .status(response.statusCode)
+        .json(
+          new ApiResponse(response.statusCode, undefined,response.message)
+        );
+    } else {
+      const options = {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'None',
+      };
+      res.clearCookie("accessToken", options);
+      res.clearCookie("refreshToken", options);
+      return res
+        .status(200)
+        .json(new ApiResponse(200,{}, msg.message));
+    }
+  })
 })
+
 const getCurrentUser = AsyncHandler(async(req,res)=>{
-
+  const {id} = req.body;
+  const getUserRequest = {
+      id
+  };
+  client.getCurrentUser(getUserRequest,async(err,msg)=>{
+    if(err){
+      const response = await GrpcError(err);      
+      return res
+        .status(response.statusCode)
+        .json(
+          new ApiResponse(response.statusCode, undefined,response.message)
+        );
+    } else {
+      return res
+        .status(200)
+        .json(new ApiResponse(200, { user: msg.user }, msg.message));
+    }
+  })
 })
 
-export { registerUser,loginUser,loginPatient,logoutUser,getCurrentUser };
+export { registerUser,loginUser,loginPatient,logoutUser,getCurrentUser,registerPatient };

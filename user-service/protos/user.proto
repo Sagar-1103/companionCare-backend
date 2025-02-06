@@ -20,6 +20,47 @@ message CreateUserResponse {
     User user = 2;
 }
 
+message CreateTokenRequest {
+    User user = 1;
+}
+
+message CreateTokenResponse {
+    string message = 1;
+    User user = 2;
+    string refreshToken = 3;
+    string accessToken = 4;
+}
+
+message IsAuthenticatedRequest {
+    string token = 1;
+}
+
+message IsAuthenticatedResponse {
+    User user = 1;
+    bool ok = 2;
+}
+
+message LogoutUserRequest {
+    User user = 1;
+}
+
+message LogoutUserResponse {
+    string message = 1;
+}
+
+message GetCurrentUserRequest {
+    string id = 1;
+}
+
+message GetCurrentUserResponse {
+    User user = 1;
+    string message = 2;
+}
+
 service UserService {
     rpc CreateUser(CreateUserRequest) returns (CreateUserResponse) {}
+    rpc CreateToken(CreateTokenRequest) returns (CreateTokenResponse) {}
+    rpc IsAuthenticated(IsAuthenticatedRequest) returns (IsAuthenticatedResponse) {};
+    rpc LogoutUser(LogoutUserRequest) returns (LogoutUserResponse) {};
+    rpc GetCurrentUser(GetCurrentUserRequest) returns (GetCurrentUserResponse) {}
 }
