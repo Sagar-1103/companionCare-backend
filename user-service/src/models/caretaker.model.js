@@ -9,6 +9,9 @@ const caretakerSchema = new Schema(
     patientId:{
         type:mongoose.Types.ObjectId,
         ref:"Patient"
+    },
+    code:{
+      type:String,
     }
   },
   {

@@ -9,6 +9,9 @@ message User {
     string phNo = 6;
     string dob = 7;
     string gender = 8;
+    string code = 9;
+    string caretakerId = 10;
+    string patientId = 11;
 }
 
 message CreateUserRequest {
@@ -64,4 +67,3 @@ service UserService {
     rpc LogoutUser(LogoutUserRequest) returns (LogoutUserResponse) {};
     rpc GetCurrentUser(GetCurrentUserRequest) returns (GetCurrentUserResponse) {}
 }
-

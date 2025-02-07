@@ -5,12 +5,13 @@ import {Patient} from "./models/patient.model.js";
 import grpc from "@grpc/grpc-js";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
+import { v4 as uuidv4 } from 'uuid';
 dotenv.config();
 
 const createUser = async(call,cb)=>{
     try {
-    const {name,email,password,phNo,gender,dob,role} = call.request.user;
-    if(!name || !email || !password || !phNo || !gender || !dob || !role) {
+    const {email,password,role,phNo} = call.request.user;
+    if(!email || !password || !role || !phNo) {
         return cb({
             code: grpc.status.INVALID_ARGUMENT,
             message: "Missing required fields.",
@@ -25,7 +26,8 @@ const createUser = async(call,cb)=>{
         },null);
     }
 
-    const createdUser = await User.create({name,email,password,phNo,gender,dob,role});
+    const createdUser = await User.create({email,password,role,phNo});
+    let user;
     if (!createdUser) {
         return cb({
             code: grpc.status.INTERNAL,
@@ -40,6 +42,8 @@ const createUser = async(call,cb)=>{
                 message: "Failed to create caretaker.",
             },null);
         }
+        createdUser.password = undefined;
+        user = createdUser;
     }
     if(role==="doctor"){
         const createdDoctor = await Doctor.create({doctorId:createdUser._id});
@@ -49,19 +53,47 @@ const createUser = async(call,cb)=>{
                 message: "Failed to create doctor.",
             },null);
         }
+        createdUser.password = undefined;
+        user = createdUser;
     }
     if(role==="patient"){
-        const createdPatient = await Patient.create({patientId:createdUser._id});
+        const {name,gender,dob,caretakerId} = call.request.user;
+        
+        if(!name || !gender || !dob) {
+            return cb({
+                code: grpc.status.INVALID_ARGUMENT,
+                message: "Missing required fields for patient.",
+            },null);
+        }
+        const genCode = uuidv4();
+        const createdPatient = await Patient.create({patientId:createdUser._id,name,gender,dob,code:genCode.slice(0,6)});
         if (!createdPatient) {
             return cb({
                 code: grpc.status.INTERNAL,
                 message: "Failed to create patient.",
             },null);
         }
+        if(caretakerId){
+            await Patient.findByIdAndUpdate(createdPatient._id,{caretakerId})
+            await Caretaker.findOneAndUpdate({caretakerId},{code:genCode.slice(0,6),patientId:createdUser._id});
+        }
+        const res = {
+            id:createdUser._id,
+            name:createdPatient.name ,
+            email:createdUser.email ,
+            password:undefined ,
+            role:createdUser.role ,
+            phNo:createdUser.phNo ,
+            dob:createdPatient.dob ,
+            gender:createdPatient.gender,
+            code:createdPatient.code,
+            caretakerId
+        }
+        user = res;
     }
     return cb(null, {
         message: "User created successfully.",
-        user:createdUser
+        user
     });
     } catch (error) {
         console.error("Error in createUser:", error);
@@ -81,20 +113,27 @@ try {
             message: "Missing required fields.",
         },null);
     }
-    // const loggedUser = await User.findById(user._id);
-    const loggedUser = await User.findOne({email:user.email});
-    if(!loggedUser) {
-        return cb({
-            code: grpc.status.INVALID_ARGUMENT,
-            message: "No user found.",
-        },null);
+    let loggedUser
+    if(!user.code){
+        loggedUser = await User.findOne({email:user.email});
+        if(!loggedUser) {
+            return cb({
+                code: grpc.status.INVALID_ARGUMENT,
+                message: "No user found.",
+            },null);
+        }
+    
+        const isPasswordValid = await loggedUser.isPasswordCorrect(user.password);
+        if (!isPasswordValid) {
+            return cb({
+                code: grpc.status.INVALID_ARGUMENT,
+                message: "Incorrect Credentials",
+            },null);
+        }
     }
-    const isPasswordValid = await loggedUser.isPasswordCorrect(user.password);
-    if (!isPasswordValid) {
-        return cb({
-            code: grpc.status.INVALID_ARGUMENT,
-            message: "Incorrect Credentials",
-        },null);
+    else {
+        const temp = await Patient.findOne({code:user.code});
+        loggedUser = await User.findById(temp.patientId);
     }
     const accessToken = loggedUser.generateAccessToken();
     const refreshToken = loggedUser.generateRefreshToken();
@@ -106,10 +145,27 @@ try {
     }
     loggedUser.refreshToken = refreshToken;
     await loggedUser.save({ validateBeforeSave: "false" });
+    
+    let tempUser = loggedUser;
+    if(loggedUser.role==="patient"){
+        const fetchedUser = await Patient.findOne({patientId:loggedUser._id});
+        tempUser.dob = fetchedUser.dob;
+        tempUser.name = fetchedUser.name;
+        tempUser.gender = fetchedUser.gender;
+        tempUser.code = fetchedUser.code;
+        tempUser.caretakerId = fetchedUser.caretakerId;
+        tempUser.patientId = fetchedUser.patientId;
+    }
+    if(loggedUser.role==="caretaker"){
+        const fetchedUser = await Caretaker.findOne({caretakerId:loggedUser._id});
+        tempUser.code = fetchedUser.code;
+        tempUser.patientId = fetchedUser.patientId;
+        tempUser.caretakerId = fetchedUser.caretakerId;
+    }
 
     return cb(null, {
         message: "Access and refresh tokens generated",
-        user:loggedUser,
+        user:tempUser,
         refreshToken,
         accessToken
     });
@@ -203,9 +259,25 @@ const getCurrentUser = async(call,cb)=>{
             },null);
         }
         fetchedUser.password = null;
+        let tempUser = fetchedUser;
+        if(fetchedUser.role==="patient"){
+            const fetchedPatient = await Patient.findOne({patientId:fetchedUser._id});
+            tempUser.dob = fetchedPatient.dob;
+            tempUser.name = fetchedPatient.name;
+            tempUser.gender = fetchedPatient.gender;
+            tempUser.code = fetchedPatient.code;
+            tempUser.caretakerId = fetchedPatient.caretakerId;
+            tempUser.patientId = fetchedPatient.patientId;
+        }
+        if(fetchedUser.role==="caretaker"){
+            const fetchedCaretaker = await Caretaker.findOne({caretakerId:fetchedUser._id});
+            tempUser.code = fetchedCaretaker.code;
+            tempUser.patientId = fetchedCaretaker.patientId;
+        }
+        
         return cb(null, {
             message: "Current user fetched successfully.",
-            user:fetchedUser,
+            user:tempUser,
         });
     } catch (error) {
         console.error("Error getting user:", error);

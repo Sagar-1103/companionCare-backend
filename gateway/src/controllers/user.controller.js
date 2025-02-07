@@ -21,7 +21,7 @@ const client = new UserService(
 );
 
 const registerUser = AsyncHandler(async (req, res) => {
-  const {name,email,password,phNo,gender,dob,role} = req.body;
+  const {name,email,password,phNo,gender,dob,role,caretakerId} = req.body;
   const createUserRequest = {
     user: {
       email,
@@ -30,7 +30,8 @@ const registerUser = AsyncHandler(async (req, res) => {
       phNo,
       gender,
       dob,
-      role
+      role,
+      caretakerId
     },
   };
   client.createUser(createUserRequest, async(err, msg) => {
@@ -50,11 +51,12 @@ const registerUser = AsyncHandler(async (req, res) => {
 });
 
 const loginUser = AsyncHandler(async(req,res)=>{
-  const { email, password } = req.body;
+  const { email, password,code } = req.body;
   const createTokenRequest = {
     user: {
       email,
       password,
+      code,
     },
   };
 
@@ -81,13 +83,6 @@ const loginUser = AsyncHandler(async(req,res)=>{
 
 })
 
-const registerPatient = AsyncHandler(async(req,res)=>{
-
-})
-
-const loginPatient = AsyncHandler(async(req,res)=>{
-  
-})
 const logoutUser = AsyncHandler(async(req,res)=>{
   const {id} = req.body;
   const logoutUserRequest = {
@@ -139,4 +134,4 @@ const getCurrentUser = AsyncHandler(async(req,res)=>{
   })
 })
 
-export { registerUser,loginUser,loginPatient,logoutUser,getCurrentUser,registerPatient };
+export { registerUser,loginUser,logoutUser,getCurrentUser };
