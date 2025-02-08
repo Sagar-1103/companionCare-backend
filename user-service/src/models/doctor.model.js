@@ -15,6 +15,10 @@ const doctorSchema = new Schema(
         code: {
           type: String,
         },
+        roomId: {
+          type: mongoose.Types.ObjectId,
+          ref: "Room",
+        },
       }
     ]
   },

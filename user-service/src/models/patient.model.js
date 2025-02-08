@@ -34,7 +34,18 @@ const patientSchema = new Schema(
     code:{
       type:String,
       required:true,
+    },
+    roomIds:{
+      caretakerRoomId:{
+        type: mongoose.Types.ObjectId,
+        ref: "Room",
+      },
+      doctorRoomId:{
+        type: mongoose.Types.ObjectId,
+        ref: "Room",
+      }
     }
+
   },
   {
     timestamps: true,

@@ -15,26 +15,6 @@ message User {
     string doctorId = 12;
 }
 
-message CreateUserRequest {
-    User user = 1;
-}
-
-message CreateUserResponse {
-    string message = 1;
-    User user = 2;
-}
-
-message CreateTokenRequest {
-    User user = 1;
-}
-
-message CreateTokenResponse {
-    string message = 1;
-    User user = 2;
-    string refreshToken = 3;
-    string accessToken = 4;
-}
-
 message IsAuthenticatedRequest {
     string token = 1;
 }
@@ -45,20 +25,11 @@ message IsAuthenticatedResponse {
 }
 
 message LogoutUserRequest {
-    User user = 1;
+    string id = 1;
 }
 
 message LogoutUserResponse {
     string message = 1;
-}
-
-message GetCurrentUserRequest {
-    string id = 1;
-}
-
-message GetCurrentUserResponse {
-    User user = 1;
-    string message = 2;
 }
 
 message PairPatientRequest {
@@ -67,15 +38,199 @@ message PairPatientRequest {
 }
 
 message PairPatientResponse {
-    User user = 1;
+    Patient patient = 1;
+    string message = 2;
+}
+
+message Caretaker {
+    string id = 1;
+    string email = 2;
+    string password = 3;
+    string role = 4;
+    string phNo = 5;
+    string code = 6;
+    string patientId = 7;
+    string roomId = 8;
+}
+
+message CreateCaretakerRequest {
+    string email = 1;
+    string password = 2;
+    string role = 3;
+    string phNo = 4;
+}
+
+message CreateCaretakerResponse {
+    Caretaker caretaker = 1;
+    string message = 2;
+}
+
+message ConnectedPatient {
+    string patientId = 1;
+    string code = 2;
+    string roomId = 3;
+}
+
+message Doctor {
+    string id = 1;
+    string email = 2;
+    string password = 3;
+    string role = 4;
+    string phNo = 5;
+    repeated ConnectedPatient patients = 6;
+}
+
+message CreateDoctorRequest {
+    string email = 1;
+    string password = 2;
+    string role = 3;
+    string phNo = 4;
+}
+
+message CreateDoctorResponse {
+    Doctor doctor = 1;
+    string message = 2;
+}
+
+message RoomIds {
+    string caretakerRoomId = 1;
+    string doctorRoomId = 2;
+}
+
+message Patient {
+    string id = 1;
+    string name = 2;
+    string email = 3;
+    string password = 4;
+    string role = 5;
+    string phNo = 6;
+    string dob = 7;
+    string gender = 8;
+    string code = 9;
+    string caretakerId = 10;
+    string doctorId = 12;
+    RoomIds roomIds = 13;
+}
+
+message CreatePatientByCaretakerRequest {
+    string name = 1;
+    string email = 2;
+    string dob = 3;
+    string gender = 4;
+    string caretakerId = 5;
+    string role = 6;
+    string phNo = 7;
+}
+
+message CreatePatientByCaretakerResponse {
+   Patient patient = 1;
+   string message = 2;
+}
+
+message CreateDoctorTokenRequest {
+    string email = 1;
+    string password = 2;
+}
+
+message CreateDoctorTokenResponse {
+    Doctor doctor = 1;
+    string message = 2;
+    string refreshToken = 3;
+    string accessToken = 4;
+}
+
+message CreateCaretakerTokenRequest {
+    string email = 1;
+    string password = 2;
+}
+
+message CreateCaretakerTokenResponse {
+    Caretaker caretaker = 1;
+    string message = 2;
+    string refreshToken = 3;
+    string accessToken = 4;
+}
+
+message GetCurrentCaretakerRequest {
+    string id = 1;  
+}
+
+message GetCurrentCaretakerResponse {
+    Caretaker caretaker = 1;
+    string message = 2;
+}
+
+message GetCurrentDoctorRequest {
+    string id = 1;  
+}
+
+message GetCurrentDoctorResponse {
+    Doctor doctor = 1;
+    string message = 2;
+}
+
+
+message CreatePatientWithoutCaretakerRequest {
+    string name = 1;
+    string email = 2;
+    string password = 3;
+    string phNo = 4;
+    string dob = 5;
+    string gender = 6;
+    string role =  7;
+}
+
+message CreatePatientWithoutCaretakerResponse {
+    Patient patient = 1;
+    string message = 2;
+}
+
+message CreatePatientTokenOnLoginRequest {
+    string email = 1;
+    string password = 2;
+}
+
+message CreatePatientTokenOnLoginResponse {
+    Patient patient = 1;
+    string message = 2;
+    string refreshToken = 3;
+    string accessToken = 4;
+}
+
+message CreateTokenOnCodeRequest {
+    string code = 1;
+}
+
+message CreateTokenOnCodeResponse {
+    Patient patient = 1;
+    string message = 2;
+    string refreshToken = 3;
+    string accessToken = 4;
+}
+
+message GetCurrentPatientRequest {
+    string id = 1;  
+}
+
+message GetCurrentPatientResponse {
+    Patient patient = 1;
     string message = 2;
 }
 
 service UserService {
-    rpc CreateUser(CreateUserRequest) returns (CreateUserResponse) {}
-    rpc CreateToken(CreateTokenRequest) returns (CreateTokenResponse) {}
     rpc IsAuthenticated(IsAuthenticatedRequest) returns (IsAuthenticatedResponse) {};
     rpc LogoutUser(LogoutUserRequest) returns (LogoutUserResponse) {};
-    rpc GetCurrentUser(GetCurrentUserRequest) returns (GetCurrentUserResponse) {}
-    rpc PairPatient(PairPatientRequest) returns (PairPatientResponse) {}
+    rpc PairPatient(PairPatientRequest) returns (PairPatientResponse) {};
+    rpc CreateCaretaker(CreateCaretakerRequest) returns (CreateCaretakerResponse) {};
+    rpc CreateDoctor(CreateDoctorRequest) returns (CreateDoctorResponse) {};
+    rpc CreatePatientByCaretaker(CreatePatientByCaretakerRequest) returns (CreatePatientByCaretakerResponse) {};
+    rpc CreateDoctorToken(CreateDoctorTokenRequest) returns (CreateDoctorTokenResponse) {};
+    rpc CreateCaretakerToken(CreateCaretakerTokenRequest) returns (CreateCaretakerTokenResponse) {};
+    rpc GetCurrentCaretaker(GetCurrentCaretakerRequest) returns (GetCurrentCaretakerResponse) {};
+    rpc GetCurrentDoctor(GetCurrentDoctorRequest) returns (GetCurrentDoctorResponse) {};
+    rpc CreatePatientWithoutCaretaker(CreatePatientWithoutCaretakerRequest) returns (CreatePatientWithoutCaretakerResponse) {};
+    rpc CreatePatientTokenOnLogin(CreatePatientTokenOnLoginRequest) returns (CreatePatientTokenOnLoginResponse) {};
+    rpc CreateTokenOnCode(CreateTokenOnCodeRequest) returns (CreateTokenOnCodeResponse) {};
+    rpc GetCurrentPatient(GetCurrentPatientRequest) returns (GetCurrentPatientResponse) {};
 }
+
