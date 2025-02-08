@@ -23,7 +23,7 @@ const userClient = new UserService(
 const registerDoctor = AsyncHandler(async (req, res) => {
   const {email,password,phNo,role,name} = req.body;
   const createDoctorRequest = {email,password,role,phNo,name};
-  userClient.createDoctor(createDoctorRequest, async(err, response) => {
+  userClient.createDoctor(createDoctorRequest, async(err, msg) => {
     if (err) {
       const response = await GrpcError(err);      
       return res
@@ -32,9 +32,15 @@ const registerDoctor = AsyncHandler(async (req, res) => {
           new ApiResponse(response.statusCode, undefined,response.message)
         );
     } else {
+      const options = {
+        httpOnly: true,
+        secure: true
+      };
       return res
+        .cookie('accessToken', msg.accessToken, options)
+        .cookie('refreshToken', msg.refreshToken, options)
         .status(200)
-        .json(new ApiResponse(200, { doctor: response.doctor }, response.message));
+        .json(new ApiResponse(200, { doctor: msg.doctor,accessToken:msg.accessToken,refreshToken:msg.refreshToken }, msg.message));
     }
   });
 });

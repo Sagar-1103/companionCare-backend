@@ -65,6 +65,8 @@ message CreateCaretakerRequest {
 message CreateCaretakerResponse {
     Caretaker caretaker = 1;
     string message = 2;
+    string refreshToken = 3;
+    string accessToken = 4;
 }
 
 message ConnectedPatient {
@@ -94,6 +96,8 @@ message CreateDoctorRequest {
 message CreateDoctorResponse {
     Doctor doctor = 1;
     string message = 2;
+    string refreshToken = 3;
+    string accessToken = 4;
 }
 
 message RoomIds {
@@ -187,6 +191,8 @@ message CreatePatientWithoutCaretakerRequest {
 message CreatePatientWithoutCaretakerResponse {
     Patient patient = 1;
     string message = 2;
+    string refreshToken = 3;
+    string accessToken = 4;
 }
 
 message CreatePatientTokenOnLoginRequest {

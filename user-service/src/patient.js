@@ -72,20 +72,31 @@ const createPatientWithoutCaretaker = async (call, cb) => {
         null
       );
     }
-    const res = {
-      id: createdUser._id,
-      name: createdPatient.name,
-      email: createdUser.email,
-      password: undefined,
-      role: createdUser.role,
-      phNo: createdUser.phNo,
-      dob: createdPatient.dob,
-      gender: createdPatient.gender,
-      code: createdPatient.code,
-    };
+    const accessToken = createdUser.generateAccessToken();
+    const refreshToken = createdUser.generateRefreshToken();
+    if(!accessToken || !refreshToken) {
+        return cb({
+            code: grpc.status.INTERNAL,
+            message: "Failed to generate tokens.",
+        },null);
+    }
+    createdUser.refreshToken = refreshToken;
+    await createdUser.save({ validateBeforeSave: "false" });
+    
+    let tempUser = createdUser;
+    const fetchedUser = await Patient.findOne({patientId:createdUser._id});
+    tempUser.dob = fetchedUser.dob;
+    tempUser.name = fetchedUser.name;
+    tempUser.gender = fetchedUser.gender;
+    tempUser.code = fetchedUser.code;
+    tempUser.caretakerId = fetchedUser.caretakerId;
+    tempUser.doctorId = fetchedUser.doctorId;
+    tempUser.roomIds = fetchedUser.roomIds
     return cb(null, {
-      message: "User created successfully.",
-      patient: res,
+        message: "Access and refresh tokens generated",
+        patient:tempUser,
+        refreshToken,
+        accessToken
     });
   } catch (error) {
     console.error("Error in patient wihtout caretaker:", error);
@@ -109,8 +120,8 @@ const createPatientTokenOnLogin = async (call,cb)=>{
         let loggedUser = await User.findOne({email});
         if(!loggedUser) {
             return cb({
-                code: grpc.status.INVALID_ARGUMENT,
-                message: "No user found.",
+                code: grpc.status.NOT_FOUND,
+                message: "No Patient found.",
             },null);
         }
     

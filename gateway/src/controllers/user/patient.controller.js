@@ -23,7 +23,7 @@ const userClient = new UserService(
 const registerPatient = AsyncHandler(async (req, res) => {
   const {name,email,password,phNo,gender,dob,role} = req.body;
   const createPatientWithoutCaretakerRequest = {name,email,password,phNo,gender,dob,role};
-  userClient.createPatientWithoutCaretaker(createPatientWithoutCaretakerRequest, async(err, response) => {
+  userClient.createPatientWithoutCaretaker(createPatientWithoutCaretakerRequest, async(err, msg) => {
     if (err) {
       const response = await GrpcError(err);      
       return res
@@ -32,9 +32,15 @@ const registerPatient = AsyncHandler(async (req, res) => {
           new ApiResponse(response.statusCode, undefined,response.message)
         );
     } else {
+      const options = {
+        httpOnly: true,
+        secure: true
+      };
       return res
+        .cookie('accessToken', msg.accessToken, options)
+        .cookie('refreshToken', msg.refreshToken, options)
         .status(200)
-        .json(new ApiResponse(200, { patient: response.patient }, response.message));
+        .json(new ApiResponse(200, { patient: msg.patient,accessToken:msg.accessToken,refreshToken:msg.refreshToken }, msg.message));
     }
   });
 });

@@ -39,7 +39,6 @@ const createDoctor = async(call,cb)=>{
     }
 
     const createdUser = await User.create({email,password,role,phNo});
-    let user;
     if (!createdUser) {
         return cb({
             code: grpc.status.INTERNAL,
@@ -53,13 +52,30 @@ const createDoctor = async(call,cb)=>{
                 message: "Failed to create doctor.",
             },null);
         }
-        createdUser.password = undefined;
-        createdUser.name = name;
-        user = createdUser;
-    return cb(null, {
-        message: "User created successfully.",
-        doctor:user
-    });
+     
+        const accessToken = createdUser.generateAccessToken();
+        const refreshToken = createdUser.generateRefreshToken();
+        if(!accessToken || !refreshToken) {
+            return cb({
+                code: grpc.status.INTERNAL,
+                message: "Failed to generate tokens.",
+            },null);
+        }
+        createdUser.refreshToken = refreshToken;
+
+        let tempUser = createdUser;
+        const fetchedUser = await Doctor.findOne({doctorId:createdUser._id});
+        tempUser.patients = fetchedUser.patients;
+        tempUser.name = fetchedUser.name
+        
+        await createdUser.save({ validateBeforeSave: "false" });
+        tempUser.password = undefined;
+        return cb(null, {
+            message: "Access and refresh tokens generated",
+            doctor:tempUser,
+            refreshToken,
+            accessToken
+        });
     } catch (error) {
         console.error("Error in createUser:", error);
         return cb({
@@ -81,6 +97,12 @@ const createDoctorToken = async(call,cb)=>{
             }
 
             let loggedUser = await User.findOne({email});
+            if(!loggedUser){
+                return cb({
+                    code: grpc.status.NOT_FOUND,
+                    message: "Doctor Not Found",
+                },null);
+            }
             const isPasswordValid = await loggedUser.isPasswordCorrect(password);
             if (!isPasswordValid) {
                 return cb({

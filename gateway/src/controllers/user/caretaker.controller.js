@@ -23,7 +23,7 @@ const userClient = new UserService(
 const registerCaretaker = AsyncHandler(async (req, res) => {
   const {email,password,phNo,role,name} = req.body;
   const createCaretakerRequest = {email,password,role,phNo,name};
-  userClient.createCaretaker(createCaretakerRequest, async(err, response) => {
+  userClient.createCaretaker(createCaretakerRequest, async(err, msg) => {
     if (err) {
       const response = await GrpcError(err);      
       return res
@@ -32,9 +32,15 @@ const registerCaretaker = AsyncHandler(async (req, res) => {
           new ApiResponse(response.statusCode, undefined,response.message)
         );
     } else {
+      const options = {
+        httpOnly: true,
+        secure: true
+      };
       return res
+        .cookie('accessToken', msg.accessToken, options)
+        .cookie('refreshToken', msg.refreshToken, options)
         .status(200)
-        .json(new ApiResponse(200, { caretaker: response.caretaker }, response.message));
+        .json(new ApiResponse(200, { caretaker: msg.caretaker,accessToken:msg.accessToken,refreshToken:msg.refreshToken }, msg.message));
     }
   });
 });

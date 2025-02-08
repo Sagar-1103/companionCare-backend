@@ -42,7 +42,6 @@ const createCaretaker = async(call,cb)=>{
     }
 
     const createdUser = await User.create({email,password,role,phNo});
-    let user;
     if (!createdUser) {
         return cb({
             code: grpc.status.INTERNAL,
@@ -56,12 +55,32 @@ const createCaretaker = async(call,cb)=>{
             message: "Failed to create caretaker.",
         },null);
     }
-    createdUser.password = undefined;
-    createdUser.name = name
-    user = createdUser;
+    
+    const accessToken = createdUser.generateAccessToken();
+    const refreshToken = createdUser.generateRefreshToken();
+    if(!accessToken || !refreshToken) {
+        return cb({
+            code: grpc.status.INTERNAL,
+            message: "Failed to generate tokens.",
+        },null);
+    }
+    createdUser.refreshToken = refreshToken;
+
+    let tempUser = createdUser;
+    const fetchedUser = await Caretaker.findOne({caretakerId:createdUser._id});
+    tempUser.code = fetchedUser.code;
+    tempUser.patientId = fetchedUser.patientId;
+    tempUser.caretakerId = fetchedUser.caretakerId;
+    tempUser.roomId = fetchedUser.roomId;
+    tempUser.name = fetchedUser.name;
+    
+    await createdUser.save({ validateBeforeSave: "false" });
+    tempUser.password = undefined;
     return cb(null, {
-        message: "User created successfully.",
-        caretaker:user
+        message: "Access and refresh tokens generated",
+        caretaker:tempUser,
+        refreshToken,
+        accessToken
     });
     } catch (error) {
         console.error("Error in creating caretaker:", error);
@@ -160,6 +179,12 @@ const createCaretakerToken = async(call,cb)=>{
             }
 
             let loggedUser = await User.findOne({email});
+            if(!loggedUser){
+                return cb({
+                    code: grpc.status.NOT_FOUND,
+                    message: "Caretaker Not Found",
+                },null);
+            }
             const isPasswordValid = await loggedUser.isPasswordCorrect(password);
             if (!isPasswordValid) {
                 return cb({

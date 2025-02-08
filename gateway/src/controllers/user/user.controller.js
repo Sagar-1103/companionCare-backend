@@ -23,11 +23,7 @@ const client = new UserService(
 
 const logoutUser = AsyncHandler(async(req,res)=>{
   const {id} = req.body;
-  const logoutUserRequest = {
-    user: {
-      id
-    },
-  };
+  const logoutUserRequest = {id};
   client.logoutUser(logoutUserRequest,async(err,msg)=>{
     if(err){
       const response = await GrpcError(err);      
