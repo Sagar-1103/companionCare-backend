@@ -2,7 +2,6 @@ import { User } from "./models/user.model.js";
 import {Caretaker} from "./models/caretaker.model.js";
 import {Patient} from "./models/patient.model.js";
 import grpc from "@grpc/grpc-js";
-import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import protoLoader from "@grpc/proto-loader";
 import { v4 as uuidv4 } from 'uuid';
@@ -24,8 +23,10 @@ const chatClient = new ChatService(
 
 const createCaretaker = async(call,cb)=>{
     try {
-    const {email,password,role,phNo} = call.request;
-    if(!email || !password || !role || !phNo) {
+    const {name,email,password,role,phNo} = call.request;
+    console.log(name,email,password,role,phNo);
+    
+    if(!email || !password || !role || !phNo || !name) {
         return cb({
             code: grpc.status.INVALID_ARGUMENT,
             message: "Missing required fields.",
@@ -48,7 +49,7 @@ const createCaretaker = async(call,cb)=>{
             message: "Failed to create user.",
         },null);
     }
-    const createdCaretaker = await Caretaker.create({caretakerId:createdUser._id});
+    const createdCaretaker = await Caretaker.create({caretakerId:createdUser._id,name});
     if (!createdCaretaker) {
         return cb({
             code: grpc.status.INTERNAL,
@@ -56,6 +57,7 @@ const createCaretaker = async(call,cb)=>{
         },null);
     }
     createdUser.password = undefined;
+    createdUser.name = name
     user = createdUser;
     return cb(null, {
         message: "User created successfully.",
@@ -181,6 +183,7 @@ const createCaretakerToken = async(call,cb)=>{
             tempUser.patientId = fetchedUser.patientId;
             tempUser.caretakerId = fetchedUser.caretakerId;
             tempUser.roomId = fetchedUser.roomId;
+            tempUser.name = fetchedUser.name;
             
             await loggedUser.save({ validateBeforeSave: "false" });
             tempUser.password = undefined;
@@ -221,6 +224,7 @@ const getCurrentCaretaker = async(call,cb)=>{
         tempUser.code = fetchedCaretaker.code;
         tempUser.patientId = fetchedCaretaker.patientId;
         tempUser.roomId = fetchedCaretaker.roomId;
+        tempUser.name = fetchedCaretaker.name;
         return cb(null, {
             message: "Current user fetched successfully.",
             caretaker:tempUser,

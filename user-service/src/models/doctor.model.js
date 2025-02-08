@@ -6,6 +6,10 @@ const doctorSchema = new Schema(
         type:mongoose.Types.ObjectId,
         ref:"User"
     },
+    name:{
+      type:String,
+      required:true,
+    },
     patients:[
       {
         patientId: {

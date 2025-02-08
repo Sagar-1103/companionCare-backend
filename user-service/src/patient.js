@@ -1,9 +1,6 @@
 import { User } from "./models/user.model.js";
-import { Caretaker } from "./models/caretaker.model.js";
-import { Doctor } from "./models/doctor.model.js";
 import { Patient } from "./models/patient.model.js";
 import grpc from "@grpc/grpc-js";
-import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import protoLoader from "@grpc/proto-loader";
 import { v4 as uuidv4 } from "uuid";
@@ -142,7 +139,7 @@ const createPatientTokenOnLogin = async (call,cb)=>{
         tempUser.gender = fetchedUser.gender;
         tempUser.code = fetchedUser.code;
         tempUser.caretakerId = fetchedUser.caretakerId;
-        tempUser.patientId = fetchedUser.patientId;
+        tempUser.doctorId = fetchedUser.doctorId;
         tempUser.roomIds = fetchedUser.roomIds
         return cb(null, {
             message: "Access and refresh tokens generated",
@@ -195,8 +192,9 @@ const createTokenOnCode = async(call,cb)=>{
           tempUser.gender = fetchedUser.gender;
           tempUser.code = fetchedUser.code;
           tempUser.caretakerId = fetchedUser.caretakerId;
-          tempUser.patientId = fetchedUser.patientId;
+          tempUser.doctorId = fetchedUser.doctorId;
           tempUser.roomIds = fetchedUser.roomIds
+          
       return cb(null, {
           message: "Access and refresh tokens generated",
           patient:tempUser,
@@ -238,7 +236,7 @@ const getCurrentPatient = async(call,cb)=>{
     tempUser.gender = fetchedPatient.gender;
     tempUser.code = fetchedPatient.code;
     tempUser.caretakerId = fetchedPatient.caretakerId;
-    tempUser.patientId = fetchedPatient.patientId;
+    tempUser.doctorId = fetchedPatient.doctorId;
     tempUser.roomIds = fetchedPatient.roomIds
     return cb(null, {
         message: "Current user fetched successfully.",

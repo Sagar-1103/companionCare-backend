@@ -1,12 +1,9 @@
 import { User } from "./models/user.model.js";
-import {Caretaker} from "./models/caretaker.model.js";
 import {Doctor} from "./models/doctor.model.js";
 import {Patient} from "./models/patient.model.js";
 import grpc from "@grpc/grpc-js";
-import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import protoLoader from "@grpc/proto-loader";
-import { v4 as uuidv4 } from 'uuid';
 dotenv.config();
 
 const chatProtoPath = "./protos/chat.proto";
@@ -25,8 +22,8 @@ const chatClient = new ChatService(
 
 const createDoctor = async(call,cb)=>{
     try {
-    const {email,password,role,phNo} = call.request;
-    if(!email || !password || !role || !phNo) {
+    const {email,password,role,phNo,name} = call.request;
+    if(!email || !password || !role || !phNo || !name) {
         return cb({
             code: grpc.status.INVALID_ARGUMENT,
             message: "Missing required fields.",
@@ -49,7 +46,7 @@ const createDoctor = async(call,cb)=>{
             message: "Failed to create user.",
         },null);
     }
-        const createdDoctor = await Doctor.create({doctorId:createdUser._id});
+        const createdDoctor = await Doctor.create({doctorId:createdUser._id,name});
         if (!createdDoctor) {
             return cb({
                 code: grpc.status.INTERNAL,
@@ -57,6 +54,7 @@ const createDoctor = async(call,cb)=>{
             },null);
         }
         createdUser.password = undefined;
+        createdUser.name = name;
         user = createdUser;
     return cb(null, {
         message: "User created successfully.",
@@ -103,6 +101,7 @@ const createDoctorToken = async(call,cb)=>{
             let tempUser = loggedUser;
             const fetchedUser = await Doctor.findOne({doctorId:loggedUser._id});
             tempUser.patients = fetchedUser.patients;
+            tempUser.name = fetchedUser.name
             
             await loggedUser.save({ validateBeforeSave: "false" });
             tempUser.password = undefined;
@@ -141,6 +140,7 @@ const getCurrentDoctor = async(call,cb)=>{
         let tempUser = fetchedUser;
         const fetchedCaretaker = await Doctor.findOne({doctorId:fetchedUser._id});
         tempUser.patients = fetchedCaretaker.patients;
+        tempUser.name = fetchedCaretaker.name;
         return cb(null, {
             message: "Current user fetched successfully.",
             doctor:tempUser,

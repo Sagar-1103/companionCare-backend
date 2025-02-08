@@ -21,8 +21,8 @@ const userClient = new UserService(
 );
 
 const registerCaretaker = AsyncHandler(async (req, res) => {
-  const {email,password,phNo,role} = req.body;
-  const createCaretakerRequest = {email,password,role,phNo};
+  const {email,password,phNo,role,name} = req.body;
+  const createCaretakerRequest = {email,password,role,phNo,name};
   userClient.createCaretaker(createCaretakerRequest, async(err, response) => {
     if (err) {
       const response = await GrpcError(err);      

@@ -1,12 +1,8 @@
 import { User } from "./models/user.model.js";
-import {Caretaker} from "./models/caretaker.model.js";
-import {Doctor} from "./models/doctor.model.js";
-import {Patient} from "./models/patient.model.js";
 import grpc from "@grpc/grpc-js";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import protoLoader from "@grpc/proto-loader";
-import { v4 as uuidv4 } from 'uuid';
 dotenv.config();
 
 const chatProtoPath = "./protos/chat.proto";

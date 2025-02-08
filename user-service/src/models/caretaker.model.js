@@ -6,6 +6,10 @@ const caretakerSchema = new Schema(
         type:mongoose.Types.ObjectId,
         ref:"User"
     },
+    name:{
+      type:String,
+      required:true,
+    },
     patientId:{
         type:mongoose.Types.ObjectId,
         ref:"Patient"

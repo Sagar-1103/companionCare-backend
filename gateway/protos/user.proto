@@ -51,6 +51,7 @@ message Caretaker {
     string code = 6;
     string patientId = 7;
     string roomId = 8;
+    string name = 9;
 }
 
 message CreateCaretakerRequest {
@@ -58,6 +59,7 @@ message CreateCaretakerRequest {
     string password = 2;
     string role = 3;
     string phNo = 4;
+    string name = 5;
 }
 
 message CreateCaretakerResponse {
@@ -78,6 +80,7 @@ message Doctor {
     string role = 4;
     string phNo = 5;
     repeated ConnectedPatient patients = 6;
+    string name = 7;
 }
 
 message CreateDoctorRequest {
@@ -85,6 +88,7 @@ message CreateDoctorRequest {
     string password = 2;
     string role = 3;
     string phNo = 4;
+    string name = 5;
 }
 
 message CreateDoctorResponse {

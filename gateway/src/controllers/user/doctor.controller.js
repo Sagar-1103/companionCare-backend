@@ -21,8 +21,8 @@ const userClient = new UserService(
 );
 
 const registerDoctor = AsyncHandler(async (req, res) => {
-  const {email,password,phNo,role} = req.body;
-  const createDoctorRequest = {email,password,role,phNo};
+  const {email,password,phNo,role,name} = req.body;
+  const createDoctorRequest = {email,password,role,phNo,name};
   userClient.createDoctor(createDoctorRequest, async(err, response) => {
     if (err) {
       const response = await GrpcError(err);      
