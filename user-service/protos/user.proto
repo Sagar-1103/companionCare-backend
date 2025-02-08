@@ -12,6 +12,7 @@ message User {
     string code = 9;
     string caretakerId = 10;
     string patientId = 11;
+    string doctorId = 12;
 }
 
 message CreateUserRequest {
@@ -60,10 +61,21 @@ message GetCurrentUserResponse {
     string message = 2;
 }
 
+message PairPatientRequest {
+    string code = 1;
+    string doctorId = 2;
+}
+
+message PairPatientResponse {
+    User user = 1;
+    string message = 2;
+}
+
 service UserService {
     rpc CreateUser(CreateUserRequest) returns (CreateUserResponse) {}
     rpc CreateToken(CreateTokenRequest) returns (CreateTokenResponse) {}
     rpc IsAuthenticated(IsAuthenticatedRequest) returns (IsAuthenticatedResponse) {};
     rpc LogoutUser(LogoutUserRequest) returns (LogoutUserResponse) {};
     rpc GetCurrentUser(GetCurrentUserRequest) returns (GetCurrentUserResponse) {}
+    rpc PairPatient(PairPatientRequest) returns (PairPatientResponse) {}
 }

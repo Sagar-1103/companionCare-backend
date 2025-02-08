@@ -134,4 +134,23 @@ const getCurrentUser = AsyncHandler(async(req,res)=>{
   })
 })
 
-export { registerUser,loginUser,logoutUser,getCurrentUser };
+const pairPatientToDoctor = AsyncHandler(async(req,res)=>{
+  const {code,doctorId} = req.body;
+  const pairPatientRequest = {code,doctorId};
+  client.pairPatient(pairPatientRequest,async(err,msg)=>{
+    if(err){
+      const response = await GrpcError(err);      
+      return res
+        .status(response.statusCode)
+        .json(
+          new ApiResponse(response.statusCode, undefined,response.message)
+        );
+    } else {
+      return res
+        .status(200)
+        .json(new ApiResponse(200, { patient: msg.user }, msg.message));
+    }
+  })
+})
+
+export { registerUser,loginUser,logoutUser,getCurrentUser,pairPatientToDoctor };

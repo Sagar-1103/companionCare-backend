@@ -1,0 +1,41 @@
+syntax = "proto3";
+
+message Room {
+  string id = 1;
+  string user1Id = 2;
+  string user2Id = 3;
+}
+
+message CreateRoomRequest {
+  string user1Id = 1;
+  string user2Id = 2;
+}
+
+message CreateRoomResponse {
+  string message = 1;
+  Room room = 2;
+}
+
+message ChatMessage {
+  string id = 1;
+  string senderId = 2;
+  string roomId = 3;
+  string message = 4;
+  string createdAt = 5;
+  string messageType = 6;
+}
+
+message GetChatsRequest {
+  string roomId = 1;
+}
+
+message GetChatsResponse {
+  repeated ChatMessage chats = 1;
+  string message = 2;
+}
+
+service ChatService {
+  rpc CreateRoom(CreateRoomRequest) returns (CreateRoomResponse) {};
+  rpc GetChats(GetChatsRequest) returns (GetChatsResponse) {};
+}
+

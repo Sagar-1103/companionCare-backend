@@ -5,8 +5,23 @@ import {Patient} from "./models/patient.model.js";
 import grpc from "@grpc/grpc-js";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
+import protoLoader from "@grpc/proto-loader";
 import { v4 as uuidv4 } from 'uuid';
 dotenv.config();
+
+const chatProtoPath = "./protos/chat.proto";
+const packageDefinition = protoLoader.loadSync(chatProtoPath, {
+  keepCase: true,
+  longs: String,
+  defaults: true,
+  oneofs: true,
+});
+
+const ChatService = grpc.loadPackageDefinition(packageDefinition).ChatService;
+const chatClient = new ChatService(
+  process.env.CHAT_SERVICE_PORT,
+  grpc.credentials.createInsecure()
+);
 
 const createUser = async(call,cb)=>{
     try {
@@ -76,6 +91,17 @@ const createUser = async(call,cb)=>{
         if(caretakerId){
             await Patient.findByIdAndUpdate(createdPatient._id,{caretakerId})
             await Caretaker.findOneAndUpdate({caretakerId},{code:genCode.slice(0,6),patientId:createdUser._id});
+            const createRoomRequest = {
+                user1Id:createdUser._id,user2Id:caretakerId
+              };
+            chatClient.createRoom(createRoomRequest,(err,msg)=>{
+                if(err){
+                    return cb({
+                        code: grpc.status.INTERNAL,
+                        message: "Failed to create room.",
+                    },null);
+                }
+            })
         }
         const res = {
             id:createdUser._id,
@@ -268,6 +294,7 @@ const getCurrentUser = async(call,cb)=>{
             tempUser.code = fetchedPatient.code;
             tempUser.caretakerId = fetchedPatient.caretakerId;
             tempUser.patientId = fetchedPatient.patientId;
+            tempUser.doctorId = fetchedPatient.doctorId;
         }
         if(fetchedUser.role==="caretaker"){
             const fetchedCaretaker = await Caretaker.findOne({caretakerId:fetchedUser._id});
@@ -288,5 +315,64 @@ const getCurrentUser = async(call,cb)=>{
     }
 }
 
-export {createUser,createToken,isAuthenticated,logoutUser,getCurrentUser};
+const pairPatient = async(call,cb)=>{
+    try {
+        const {code,doctorId} = call.request;
+        if(!code || !doctorId){
+            return cb({
+                code: grpc.status.INVALID_ARGUMENT,
+                message: "No user found",
+            },null);
+        }
+        const fetchedPatient =  await Patient.findOneAndUpdate({code},{doctorId},{new:true});
+        if (!fetchedPatient) {
+            return cb({
+                code: grpc.status.NOT_FOUND,
+                message: "Patient not found.",
+            }, null);
+        }
+        const updatedDoctor = await Doctor.findOneAndUpdate(
+            {doctorId},
+            {
+                $addToSet: {
+                    patients: {
+                        patientId: fetchedPatient._id,
+                        code: fetchedPatient.code,
+                    },
+                },
+            },
+            { new: true }
+        );
+        if (!updatedDoctor) {
+            return cb({
+                code: grpc.status.NOT_FOUND,
+                message: "Doctor not found.",
+            }, null);
+        }
+        const createRoomRequest = {
+            user1Id:fetchedPatient._id._id,user2Id:doctorId
+          };
+        chatClient.createRoom(createRoomRequest,(err,msg)=>{
+            if(err){
+                return cb({
+                    code: grpc.status.INTERNAL,
+                    message: "Failed to create room.",
+                },null);
+            }
+        })
+        return cb(null, {
+            message: "Doctor paired with patient successfully.",
+            user:fetchedPatient,
+        });
+    } catch (error) {
+        console.error("Error pairing doctor:", error);
+        return cb({
+            code: grpc.status.INTERNAL,
+            message: "Internal Server Error: " + error.message,
+        });
+    }
+}
+
+
+export {createUser,createToken,isAuthenticated,logoutUser,getCurrentUser,pairPatient};
 

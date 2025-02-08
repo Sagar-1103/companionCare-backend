@@ -6,10 +6,17 @@ const doctorSchema = new Schema(
         type:mongoose.Types.ObjectId,
         ref:"User"
     },
-    patientId:{
-        type:mongoose.Types.ObjectId,
-        ref:"Patient"
-    }
+    patients:[
+      {
+        patientId: {
+          type: mongoose.Types.ObjectId,
+          ref: "Patient",
+        },
+        code: {
+          type: String,
+        },
+      }
+    ]
   },
   {
     timestamps: true,
