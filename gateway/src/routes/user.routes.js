@@ -10,16 +10,16 @@ const router = Router();
 router.route("/register-caretaker").post(registerCaretaker);
 router.route("/register-patient-by-caretaker").post(registerPatientByCaretaker);
 router.route("/login-caretaker").post(loginCaretaker);                 
-router.route("/current-caretaker").get(getCaretaker);                 
+router.route("/current-caretaker/:id").get(getCaretaker);                 
 
 //Doctor routes
 router.route("/register-doctor").post(registerDoctor);
 router.route("/login-doctor").post(loginDoctor);     
-router.route("/current-doctor").get(getDoctor);                 
+router.route("/current-doctor/:id").get(getDoctor);                 
 router.route("/pair-patient").post(pairPatientToDoctor);
 
 //Patients
-router.route("/current-patient").get(getPatient);
+router.route("/current-patient/:id").get(getPatient);
 
 //Patient with caretaker routes
 router.route("/login-code").post(loginPatientOnCode);

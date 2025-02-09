@@ -93,7 +93,7 @@ const loginCaretaker = AsyncHandler(async(req,res)=>{
 
 
 const getCaretaker = AsyncHandler(async(req,res)=>{
-  const {id} = req.body;
+  const {id} = req.params;
   const getCurrentCaretakerRequest = { id };
   userClient.getCurrentCaretaker(getCurrentCaretakerRequest,async(err,msg)=>{
     if(err){

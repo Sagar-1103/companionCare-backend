@@ -102,7 +102,7 @@ const loginPatientOnCode = AsyncHandler(async(req,res)=>{
 
 
 const getPatient = AsyncHandler(async(req,res)=>{
-  const {id} = req.body;
+  const {id} = req.params;
   const getCurrentPatientRequest = { id };
   userClient.getCurrentPatient(getCurrentPatientRequest,async(err,msg)=>{
     if(err){

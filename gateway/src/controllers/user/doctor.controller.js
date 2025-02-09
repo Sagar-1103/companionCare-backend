@@ -73,7 +73,7 @@ const loginDoctor = AsyncHandler(async(req,res)=>{
 })
 
 const getDoctor = AsyncHandler(async(req,res)=>{
-  const {id} = req.body;
+  const {id} = req.params;
   const getCurrentDoctorRequest = { id };
   userClient.getCurrentDoctor(getCurrentDoctorRequest,async(err,msg)=>{
     if(err){

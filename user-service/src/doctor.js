@@ -200,7 +200,7 @@ const pairPatient = async(call,cb)=>{
             }, null);
         }
         const createRoomRequest = {
-            user1Id:fetchedPatient._id._id,user2Id:doctorId
+            user1Id:fetchedPatient.patientId,user2Id:doctorId
           };
         chatClient.createRoom(createRoomRequest,async(err,msg)=>{
             if(err){
@@ -215,7 +215,7 @@ const pairPatient = async(call,cb)=>{
                 {
                     $addToSet: {
                         patients: {
-                            patientId: fetchedPatient._id,
+                            patientId: fetchedPatient.patientId,
                             code: fetchedPatient.code,
                             roomId:msg.room.id,
                         },
