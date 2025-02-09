@@ -1,0 +1,76 @@
+syntax = "proto3";
+
+message Timings {
+    string breakfast = 1;
+    string lunch = 2;
+    string dinner = 3;
+}
+
+message Time {
+    string patientId = 1;
+    Timings timings = 2;
+}
+
+message SetTimeRequest {
+    string patientId = 1;
+    string breakfast = 2;
+    string lunch = 3;
+    string dinner = 4;
+}
+
+message SetTimeResponse {
+    Time time = 1;
+    string message = 2;
+}
+
+message SetMedicationRequest {
+    string patientId = 1;
+    string medicineName = 2;
+    string medicineType = 3;
+    string medicineDosage = 4;
+    string timing = 5;
+    string medText = 6;
+    string startDate = 7;
+    string endDate = 8;
+}
+
+message Medication {
+    string patientId = 1;
+    string medicineName = 2;
+    string medicineType = 3;
+    string medicineDosage = 4;
+    string timing = 5;
+    string medText = 6;
+    string startDate = 7;
+    string endDate = 8;
+}
+
+message SetMedicationResponse {
+    Medication medication = 1;
+    string message = 2;
+}
+
+message DeleteMedicationRequest {
+    string medicationId = 1;
+}
+
+message DeleteMedicationResponse {
+    Medication deletedMedication = 1;
+    string message = 2;
+}
+
+message GetMedicationsRequest {
+    string patientId = 1;
+}
+
+message GetMedicationsResponse {
+    repeated Medication medications = 1;
+}
+
+
+service MedicationService {
+    rpc SetTime(SetTimeRequest) returns (SetTimeResponse) {}
+    rpc SetMedication(SetMedicationRequest) returns (SetMedicationResponse) {}
+    rpc DeleteMedication(DeleteMedicationRequest) returns (DeleteMedicationResponse) {}
+    rpc GetMedications(GetMedicationsRequest) returns (GetMedicationsResponse) {}
+}
