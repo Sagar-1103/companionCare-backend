@@ -91,7 +91,9 @@ const createPatientWithoutCaretaker = async (call, cb) => {
     tempUser.code = fetchedUser.code;
     tempUser.caretakerId = fetchedUser.caretakerId;
     tempUser.doctorId = fetchedUser.doctorId;
-    tempUser.roomIds = fetchedUser.roomIds
+    tempUser.roomIds = fetchedUser.roomIds;
+    tempUser.diseases = fetchedUser.diseases;
+    
     return cb(null, {
         message: "Access and refresh tokens generated",
         patient:tempUser,
@@ -151,7 +153,8 @@ const createPatientTokenOnLogin = async (call,cb)=>{
         tempUser.code = fetchedUser.code;
         tempUser.caretakerId = fetchedUser.caretakerId;
         tempUser.doctorId = fetchedUser.doctorId;
-        tempUser.roomIds = fetchedUser.roomIds
+        tempUser.roomIds = fetchedUser.roomIds;
+        tempUser.diseases = fetchedUser.diseases;
         return cb(null, {
             message: "Access and refresh tokens generated",
             patient:tempUser,
@@ -204,7 +207,8 @@ const createTokenOnCode = async(call,cb)=>{
           tempUser.code = fetchedUser.code;
           tempUser.caretakerId = fetchedUser.caretakerId;
           tempUser.doctorId = fetchedUser.doctorId;
-          tempUser.roomIds = fetchedUser.roomIds
+          tempUser.roomIds = fetchedUser.roomIds;
+          tempUser.diseases = fetchedUser.diseases;
           
       return cb(null, {
           message: "Access and refresh tokens generated",
@@ -248,7 +252,8 @@ const getCurrentPatient = async(call,cb)=>{
     tempUser.code = fetchedPatient.code;
     tempUser.caretakerId = fetchedPatient.caretakerId;
     tempUser.doctorId = fetchedPatient.doctorId;
-    tempUser.roomIds = fetchedPatient.roomIds
+    tempUser.roomIds = fetchedPatient.roomIds;
+    tempUser.diseases = fetchedPatient.diseases;
     return cb(null, {
         message: "Current user fetched successfully.",
         patient:tempUser,

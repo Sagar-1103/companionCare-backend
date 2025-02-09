@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { logoutUser } from "../controllers/user/user.controller.js";
+import { logoutUser, setPatientDiseases } from "../controllers/user/user.controller.js";
 import { getCaretaker, loginCaretaker, registerCaretaker, registerPatientByCaretaker } from "../controllers/user/caretaker.controller.js";
 import { getDoctor, loginDoctor, pairPatientToDoctor, registerDoctor } from "../controllers/user/doctor.controller.js";
 import { getPatient, loginPatient, loginPatientOnCode, registerPatient } from "../controllers/user/patient.controller.js";
@@ -29,6 +29,7 @@ router.route("/register-patient").post(registerPatient);
 router.route("/login-patient").post(loginPatient);
 
 //all
+router.route("/set-diseases/:patientId").post(setPatientDiseases);
 router.route("/logout").post(logoutUser);
 
 export default router;

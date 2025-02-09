@@ -47,4 +47,24 @@ const logoutUser = AsyncHandler(async(req,res)=>{
   })
 })
 
-export { logoutUser };
+const setPatientDiseases = AsyncHandler(async(req,res)=>{
+  const {diseaseList} = req.body;
+  const {patientId} = req.params;
+  const setDiseasesRequest = {patientId,diseaseList};
+  client.setDiseases(setDiseasesRequest,async(err,msg)=>{
+    if(err){
+      const response = await GrpcError(err);      
+      return res
+        .status(response.statusCode)
+        .json(
+          new ApiResponse(response.statusCode, undefined,response.message)
+        );
+    } else {
+      return res
+        .status(200)
+        .json(new ApiResponse(200, { diseases: msg.diseases }, msg.message));
+    }
+  })
+})
+
+export { logoutUser,setPatientDiseases };

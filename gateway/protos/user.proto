@@ -105,6 +105,11 @@ message RoomIds {
     string doctorRoomId = 2;
 }
 
+message Disease {
+    string diseaseName = 1;
+    string diseaseId = 2; 
+}
+
 message Patient {
     string id = 1;
     string name = 2;
@@ -118,6 +123,7 @@ message Patient {
     string caretakerId = 10;
     string doctorId = 12;
     RoomIds roomIds = 13;
+    repeated Disease diseases = 14;
 }
 
 message CreatePatientByCaretakerRequest {
@@ -227,6 +233,16 @@ message GetCurrentPatientResponse {
     string message = 2;
 }
 
+message SetDiseasesRequest {
+    string patientId = 1;
+    repeated Disease diseaseList = 2;
+}
+
+message SetDiseasesResponse {
+    string message = 1;
+    repeated Disease diseases = 2;
+}
+
 service UserService {
     rpc IsAuthenticated(IsAuthenticatedRequest) returns (IsAuthenticatedResponse) {};
     rpc LogoutUser(LogoutUserRequest) returns (LogoutUserResponse) {};
@@ -242,5 +258,6 @@ service UserService {
     rpc CreatePatientTokenOnLogin(CreatePatientTokenOnLoginRequest) returns (CreatePatientTokenOnLoginResponse) {};
     rpc CreateTokenOnCode(CreateTokenOnCodeRequest) returns (CreateTokenOnCodeResponse) {};
     rpc GetCurrentPatient(GetCurrentPatientRequest) returns (GetCurrentPatientResponse) {};
+    rpc SetDiseases(SetDiseasesRequest) returns (SetDiseasesResponse) {};
 }
 

@@ -35,6 +35,16 @@ const patientSchema = new Schema(
       type:String,
       required:true,
     },
+    diseases:[
+      {
+        diseaseId:{
+          type:String,
+        },
+        diseaseName:{
+          type:String
+        }
+      }
+    ],
     roomIds:{
       caretakerRoomId:{
         type: mongoose.Types.ObjectId,

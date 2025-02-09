@@ -1,7 +1,7 @@
 import { startGrpcServer, getGrpcServer } from "./grpc.js";
 import protoLoader from "@grpc/proto-loader";
 import grpc from "@grpc/grpc-js";
-import { logoutUser} from "./src/app.js";
+import { logoutUser, setDiseases} from "./src/app.js";
 import { createCaretaker,createCaretakerToken,createPatientByCaretaker, getCurrentCaretaker } from "./src/caretaker.js";
 import { createDoctor, createDoctorToken, getCurrentDoctor, pairPatient } from "./src/doctor.js";
 import { createPatientTokenOnLogin, createPatientWithoutCaretaker, createTokenOnCode, getCurrentPatient } from "./src/patient.js";
@@ -34,4 +34,5 @@ server.addService(user_proto.UserService.service, {
   createTokenOnCode,
   getCurrentPatient,
   logoutUser,
+  setDiseases,
 });
