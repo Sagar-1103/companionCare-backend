@@ -20,8 +20,7 @@ const medicationSchema = new Schema(
       required: true,
     },
     timing: {
-      type: String,
-      enum: ["breakfast", "lunch", "dinner"],
+      type: Date,
       required: true,
     },
     medText: {
@@ -34,6 +33,12 @@ const medicationSchema = new Schema(
     endDate:{
       type:String,
       required:true,
+    },
+    before:{
+      type:Number,
+    },
+    after:{
+      type:Number,
     }
   },
   {

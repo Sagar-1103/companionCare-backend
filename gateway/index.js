@@ -5,6 +5,7 @@ import cookieParser from "cookie-parser";
 dotenv.config();
 import userRouter from "./src/routes/user.routes.js";
 import chatRouter from "./src/routes/chat.routes.js";
+import medicationRouter from "./src/routes/medication.routes.js";
 
 const app = express();
 const PORT = process.env.PORT || 5001;
@@ -20,6 +21,7 @@ app.use(cookieParser());
 
 app.use("/users",userRouter);
 app.use("/chats",chatRouter);
+app.use("/medications",medicationRouter);
 
 app.listen(PORT, () => {
     console.log(`Gateway Server Running on port ${PORT}`);

@@ -32,17 +32,22 @@ message SetMedicationRequest {
     string medText = 6;
     string startDate = 7;
     string endDate = 8;
+    string before = 9;
+    string after = 10;
 }
 
 message Medication {
-    string patientId = 1;
-    string medicineName = 2;
-    string medicineType = 3;
-    string medicineDosage = 4;
-    string timing = 5;
-    string medText = 6;
-    string startDate = 7;
-    string endDate = 8;
+    string id = 1;
+    string patientId = 2;
+    string medicineName = 3;
+    string medicineType = 4;
+    string medicineDosage = 5;
+    string timing = 6;
+    string medText = 7;
+    string startDate = 8;
+    string endDate = 9;
+    int32 before = 10;
+    int32 after = 11;
 }
 
 message SetMedicationResponse {

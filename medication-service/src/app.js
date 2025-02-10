@@ -36,14 +36,26 @@ const setTime = async(call,cb) =>{
 
 const setMedication = async(call,cb)=>{
     try {
-        const {patientId,medicineName,medicineType,medicineDosage,timing,medText,startDate,endDate} = call.request;
+        const {patientId,medicineName,medicineType,medicineDosage,timing,medText,startDate,endDate,before,after} = call.request;
         if(!patientId || !medicineName || !medicineType || !medicineDosage || !timing || !medText || !startDate || !endDate){
             return cb({
                 code: grpc.status.INVALID_ARGUMENT,
                 message: "Missing required fields.",
             },null);
         }
-        const createdMedication = await Medication.create({patientId,medicineName,medicineType,medicineDosage,timing,medText,startDate,endDate});
+        const fetchedTime = await Time.findOne({patientId});
+        let timer;
+        if (timing==="breakfast") {
+            timer  = fetchedTime.timings.breakfast;
+        }
+        if (timing==="lunch") {
+            timer  = fetchedTime.timings.lunch;
+        }
+        if (timing==="dinner") {
+            timer  = fetchedTime.timings.dinner;
+        }
+        
+        const createdMedication = await Medication.create({patientId,medicineName,medicineType,medicineDosage,timing:timer,medText,startDate,endDate,before,after});
         if(!createdMedication){
             return cb({
                 code: grpc.status.NOT_FOUND,

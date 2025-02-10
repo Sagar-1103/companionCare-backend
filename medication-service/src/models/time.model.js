@@ -5,16 +5,20 @@ const timeSchema = new Schema(
     patientId: {
       type: mongoose.Types.ObjectId,
       ref: "User",
+      unique:true,
     },
     timings: {
       breakfast: {
-        type: String,
+        type: Date,
+        required:true,
       },
       lunch: {
-        type: String,
+        type: Date,
+        required:true,
       },
       dinner: {
-        type: String,
+        type: Date,
+        required:true,
       },
     },
   },
