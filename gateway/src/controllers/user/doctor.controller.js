@@ -110,4 +110,23 @@ const pairPatientToDoctor = AsyncHandler(async(req,res)=>{
   })
 })
 
-export { registerDoctor,loginDoctor ,getDoctor,pairPatientToDoctor};
+const getDoctorsPatients = AsyncHandler(async(req,res)=>{
+  const {doctorId} = req.params;
+  const getPatientsRequest = {doctorId};
+  userClient.getPatients(getPatientsRequest,async(err,msg)=>{
+    if(err){
+      const response = await GrpcError(err);      
+      return res
+        .status(response.statusCode)
+        .json(
+          new ApiResponse(response.statusCode, undefined,response.message)
+        );
+    } else {
+      return res
+        .status(200)
+        .json(new ApiResponse(200, { patients:msg.patients }, msg.message));
+    }
+  })
+})
+
+export { registerDoctor,loginDoctor ,getDoctor,pairPatientToDoctor,getDoctorsPatients};

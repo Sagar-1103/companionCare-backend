@@ -4,7 +4,7 @@ const medicationSchema = new Schema(
   {
     patientId: {
       type: Schema.Types.ObjectId,
-      ref: "Patient",
+      ref: "User",
       required: true,
     },
     medicineName: {

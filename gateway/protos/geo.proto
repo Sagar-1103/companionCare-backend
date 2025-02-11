@@ -1,0 +1,74 @@
+syntax = "proto3";
+
+message Location {
+    string type = 1;
+    repeated double coordinates = 2;
+}
+
+message Geo {
+    string id = 1;
+    string patientId = 2;
+    bool fallDetectionStatus = 3;
+    int32 radius = 4;
+    Location patientLocation = 5;
+    Location homeLocation = 6;
+}
+
+message SetFallStatusRequest {
+    string patientId = 1;
+    bool fallDetectionStatus = 2;
+}
+
+message SetFallStatusResponse {
+    Geo geo = 1;
+    string message = 2;
+}
+
+message SetLocationRequest {
+    string patientId = 1;
+    double lon = 2;
+    double lat = 3;
+    string type = 4;
+}
+
+message SetLocationResponse {
+    Geo geo = 1;
+    string message = 2;
+}
+
+message GetGeoDetailsRequest {
+    string patientId = 1;
+}
+
+message GetGeoDetailsResponse {
+    Geo geo = 1;
+    string message = 2;
+}
+
+message IsPatientInSafeZoneRequest {
+    string patientId = 1;
+}
+
+message IsPatientInSafeZoneResponse {
+    bool isInsideSafeZone = 1;
+    string message = 2;
+}
+
+message SetRadiusRequest {
+    string patientId = 1;
+    int32 radius = 2;
+}
+
+message SetRadiusResponse {
+    Geo geo = 1;
+    string message = 2;
+}
+
+
+service GeoService {
+    rpc SetFallStatus(SetFallStatusRequest) returns (SetFallStatusResponse) {};
+    rpc SetLocation(SetLocationRequest) returns (SetLocationResponse) {};
+    rpc GetGeoDetails(GetGeoDetailsRequest) returns (GetGeoDetailsResponse) {};
+    rpc IsPatientInSafeZone(IsPatientInSafeZoneRequest) returns (IsPatientInSafeZoneResponse) {};
+    rpc SetRadius(SetRadiusRequest) returns (SetRadiusResponse) {};
+}

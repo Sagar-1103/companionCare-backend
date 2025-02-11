@@ -63,7 +63,7 @@ const setMedication = async(call,cb)=>{
             },null);
         }
         return cb(null, {
-            message: "Setting medication done succesfully.",
+            message: "Setting medication done successfully.",
             medication:createdMedication,
         });
     } catch (error) {
@@ -92,7 +92,7 @@ const deleteMedication = async(call,cb)=>{
             },null);
         }
         return cb(null, {
-            message: "Deleting mediation done succesfully.",
+            message: "Deleting mediation done successfully.",
             deletedMedication
         });
     } catch (error) {
@@ -115,7 +115,7 @@ const getMedications = async(call,cb)=>{
         }
         const medications = await Medication.find({patientId});
         return cb(null, {
-            message: "Fetched all mediations succesfully.",
+            message: "Fetched all mediations successfully.",
             medications,
         });
     } catch (error) {

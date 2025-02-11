@@ -236,5 +236,52 @@ const pairPatient = async(call,cb)=>{
     }
 }
 
-export {createDoctor,createDoctorToken,getCurrentDoctor,pairPatient};
+const getPatients = async(call,cb)=>{
+    try {
+        const {doctorId} = call.request;
+        if(!doctorId){
+            return cb({
+                code: grpc.status.INVALID_ARGUMENT,
+                message: "No user found",
+            },null);    
+        }
+        const patients = await Patient.find({doctorId});
+
+        if (!patients.length) {
+            return cb(null, {
+                message: "Fetched patients successfully.",
+                patients:[],
+            });
+        }
+
+        const fetchedPatients = await Promise.all(
+            patients.map(async (patient) => {
+                const user = await User.findById(patient.patientId);
+                if (user) {
+                    return {
+                        ...patient.toObject(),
+                        id:user.id,
+                        email: user.email,
+                        role: user.role,
+                        phNo: user.phNo
+                    };
+                }
+                return patient.toObject(); 
+            })
+          );
+         
+        return cb(null, {
+            message: "Fetched patients successfully.",
+            patients:fetchedPatients,
+        });
+    } catch (error) {
+        console.error("Error fetching patients :", error);
+        return cb({
+            code: grpc.status.INTERNAL,
+            message: "Internal Server Error: " + error.message,
+        });
+    }
+}
+
+export {createDoctor,createDoctorToken,getCurrentDoctor,pairPatient,getPatients};
 

@@ -22,5 +22,3 @@ server.addService(medication_proto.MedicationService.service, {
   deleteMedication,
   getMedications,
 });
-
-// {setTime,setMedication,deleteMedication,getMedications}

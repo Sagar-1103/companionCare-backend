@@ -243,6 +243,15 @@ message SetDiseasesResponse {
     repeated Disease diseases = 2;
 }
 
+message GetPatientsRequest {
+    string doctorId = 1;
+}
+
+message GetPatientsResponse {
+    repeated Patient patients = 1;
+    string message  = 2;
+}
+
 service UserService {
     rpc IsAuthenticated(IsAuthenticatedRequest) returns (IsAuthenticatedResponse) {};
     rpc LogoutUser(LogoutUserRequest) returns (LogoutUserResponse) {};
@@ -259,5 +268,6 @@ service UserService {
     rpc CreateTokenOnCode(CreateTokenOnCodeRequest) returns (CreateTokenOnCodeResponse) {};
     rpc GetCurrentPatient(GetCurrentPatientRequest) returns (GetCurrentPatientResponse) {};
     rpc SetDiseases(SetDiseasesRequest) returns (SetDiseasesResponse) {};
+    rpc GetPatients(GetPatientsRequest) returns (GetPatientsResponse) {};
 }
 
