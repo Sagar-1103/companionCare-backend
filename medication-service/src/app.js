@@ -2,6 +2,7 @@ import grpc from "@grpc/grpc-js";
 import dotenv from "dotenv";
 import { Time } from "./models/time.model.js";
 import { Medication } from "./models/medication.model.js";
+import { Health } from "./models/health.model.js";
 dotenv.config();
 
 const setTime = async(call,cb) =>{
@@ -141,4 +142,80 @@ const getMedications = async(call,cb)=>{
     }
 }
 
-export {setTime,setMedication,deleteMedication,getMedications};
+const setHealthDetails = async(call,cb)=>{
+    try {
+        const {patientId,date,heartRate,bloodPressure,bodyTemperature,bloodSugar,spo2,sleep,steps} = call.request.health;
+        if(!patientId || !date || !heartRate || !bloodPressure || !bodyTemperature || !bloodSugar || !spo2 || !sleep || !steps){
+            return cb({
+                code: grpc.status.INVALID_ARGUMENT,
+                message: "Missing required fields.",
+            },null);
+        }
+        const formattedDate = new Date(date).toISOString().split("T")[0];
+        let healthEntry = await Health.findOne({ patientId, date: formattedDate });
+        if (healthEntry) {
+            healthEntry.heartRate = heartRate;
+            healthEntry.bloodPressure = bloodPressure;
+            healthEntry.bodyTemperature = bodyTemperature;
+            healthEntry.bloodSugar = bloodSugar;
+            healthEntry.spo2 = spo2;
+            healthEntry.sleep = sleep;
+            healthEntry.steps = steps;
+        } else {
+            healthEntry = new Health({
+                patientId,
+                date: formattedDate,
+                heartRate,
+                bloodPressure,
+                bodyTemperature,
+                bloodSugar,
+                spo2,
+                sleep,
+                steps
+            });
+        }
+        await healthEntry.save();
+        return cb(null, {
+            message: "Health details set successfully.",
+            health:healthEntry,
+        });
+    } catch (error) {
+        console.error("Error setting health details:", error);
+        return cb({
+            code: grpc.status.INTERNAL,
+            message: "Internal Server Error: " + error.message,
+        });
+    }
+}
+
+const getHealthDetails = async(call,cb)=>{
+    try {
+        const {patientId,date} = call.request;
+        if(!patientId || !date){
+            return cb({
+                code: grpc.status.INVALID_ARGUMENT,
+                message: "Missing required fields.",
+            },null);
+        }
+        const formattedDate = new Date(date).toISOString().split("T")[0];
+        const healthEntry = await Health.findOne({ patientId, date: formattedDate });
+        if(!healthEntry){
+            return cb({
+                code: grpc.status.NOT_FOUND,
+                message: "Couldnt find the health detail for the given date.",
+            },null);
+        }
+        return cb(null, {
+            message: "Health details fetched successfully.",
+            health:healthEntry,
+        });
+    } catch (error) {
+        console.error("Error setting health details:", error);
+        return cb({
+            code: grpc.status.INTERNAL,
+            message: "Internal Server Error: " + error.message,
+        });
+    }
+}
+
+export {setTime,setMedication,deleteMedication,getMedications,setHealthDetails,getHealthDetails};

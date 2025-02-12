@@ -74,10 +74,47 @@ message GetMedicationsResponse {
     repeated Medication medications = 1;
 }
 
+message BloodPressure {
+  int32 systolic = 1;
+  int32 diastolic = 2;
+}
+
+message Health {
+    string patientId = 1;
+    string date = 2;
+    double heartRate = 3;
+    BloodPressure bloodPressure = 4;
+    double bodyTemperature = 5;
+    double bloodSugar = 6;
+    double spo2 = 7;
+    double sleep = 8;
+    double steps = 9;
+}
+
+message SetHealthDetailsRequest {
+    Health health = 1;
+}
+
+message SetHealthDetailsResponse {
+    Health health = 1;
+    string message = 2; 
+}
+
+message GetHealthDetailsRequest {
+    string patientId = 1;
+    string date = 2;
+}
+
+message GetHealthDetailsResponse {
+    Health health = 1;
+    string message = 2;
+}
 
 service MedicationService {
     rpc SetTime(SetTimeRequest) returns (SetTimeResponse) {}
     rpc SetMedication(SetMedicationRequest) returns (SetMedicationResponse) {}
     rpc DeleteMedication(DeleteMedicationRequest) returns (DeleteMedicationResponse) {}
     rpc GetMedications(GetMedicationsRequest) returns (GetMedicationsResponse) {}
+    rpc SetHealthDetails(SetHealthDetailsRequest) returns (SetHealthDetailsResponse) {}
+    rpc GetHealthDetails(GetHealthDetailsRequest) returns (GetHealthDetailsResponse) {}
 }
