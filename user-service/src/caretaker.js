@@ -3,6 +3,7 @@ import {Caretaker} from "./models/caretaker.model.js";
 import {Patient} from "./models/patient.model.js";
 import grpc from "@grpc/grpc-js";
 import dotenv from "dotenv";
+import { v2 as cloudinary } from "cloudinary";
 import protoLoader from "@grpc/proto-loader";
 import { v4 as uuidv4 } from 'uuid';
 dotenv.config();
@@ -20,6 +21,14 @@ const chatClient = new ChatService(
   process.env.CHAT_SERVICE_PORT,
   grpc.credentials.createInsecure()
 );
+
+const uploadToCloudinary = async (base64) => {
+    const response = await cloudinary.uploader.upload(`data:image/png;base64,${base64}`, {
+        folder: "speed_dials",
+    });
+    return response.secure_url;
+};
+
 
 const createCaretaker = async(call,cb)=>{
     try {
@@ -263,5 +272,49 @@ const getCurrentCaretaker = async(call,cb)=>{
     }
 }
 
+const setSpeedDials = async(call,cb)=>{
+    try {
+        const { patientId, name1, name2, phNo1, phNo2, imageBase64_1, imageBase64_2 } = call.request;
+        if(!patientId || !name1 || !name2 || !phNo1 || !phNo2 || !imageBase64_1 || !imageBase64_2){
+            return cb({
+                code: grpc.status.INVALID_ARGUMENT,
+                message: "Missing required fields.",
+            },null);    
+        }
+        const base64Image1 = imageBase64_1.toString('base64');
+        const base64Image2 = imageBase64_2.toString('base64');
 
-export {createCaretaker,createPatientByCaretaker,createCaretakerToken,getCurrentCaretaker};
+        const imageUrl1 = await uploadToCloudinary(base64Image1);
+        const imageUrl2 = await uploadToCloudinary(base64Image2);
+        if (!imageUrl1 || !imageUrl2) {
+            return cb({
+                code: grpc.status.INTERNAL,
+                message: "Error Uploading files to cloudinary",
+            },null);
+        }
+        const speedDialEntries = [
+            { name: name1, phNo: phNo1, imageUrl: imageUrl1 },
+            { name: name2, phNo: phNo2, imageUrl: imageUrl2 }
+        ];
+        const updatedPatient = await Patient.findOneAndUpdate(
+            {patientId},
+            { $set: { speedDials: speedDialEntries } }, 
+            { new: true }
+        );
+        if (!updatedPatient) {
+            return cb({
+                code: grpc.status.NOT_FOUND,
+                message: "Patient not found",
+            });
+        }
+        return cb(null, { success: true, message: "Speed dials set successfully!" });
+    } catch (error) {
+        console.error("Error setting speed dials :", error);
+        return cb({
+            code: grpc.status.INTERNAL,
+            message: "Internal Server Error: " + error.message,
+        });
+    }
+}
+
+export {createCaretaker,createPatientByCaretaker,createCaretakerToken,getCurrentCaretaker,setSpeedDials};

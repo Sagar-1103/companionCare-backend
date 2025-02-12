@@ -2,12 +2,14 @@ import grpc from "@grpc/grpc-js";
 import connectDatabase from "./src/config/db.config.js";
 const PROTO_PATH = "./protos/user.proto";
 import dotenv from "dotenv";
+import { connectCloudinary } from "./src/config/cloudinary.config.js";
 dotenv.config();
 
 const server = new grpc.Server();
 
 const startGrpcServer = async()=>{
     await connectDatabase();
+    await connectCloudinary();
     server.bindAsync(
         process.env.PORT,
         grpc.ServerCredentials.createInsecure(),

@@ -23,8 +23,8 @@ const medicationClient = new MedicationService(
 
 const setTime = AsyncHandler(async(req,res)=>{
     const {patientId} = req.params;
-    const {breakfast,lunch,dinner} = req.body;
-    const setTimeRequest = {patientId,breakfast,lunch,dinner};
+    const {breakfast,lunch,snacks,dinner} = req.body;
+    const setTimeRequest = {patientId,breakfast,lunch,snacks,dinner};
     medicationClient.setTime(setTimeRequest,async(err,msg)=>{
         if (err) {
             const response = await GrpcError(err);

@@ -16,6 +16,10 @@ const timeSchema = new Schema(
         type: Date,
         required:true,
       },
+      snacks:{
+        type:Date,
+        required:true,
+      },
       dinner: {
         type: Date,
         required:true,

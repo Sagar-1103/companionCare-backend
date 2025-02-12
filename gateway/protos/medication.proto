@@ -3,7 +3,8 @@ syntax = "proto3";
 message Timings {
     string breakfast = 1;
     string lunch = 2;
-    string dinner = 3;
+    string snacks = 3;
+    string dinner = 4;
 }
 
 message Time {
@@ -15,7 +16,8 @@ message SetTimeRequest {
     string patientId = 1;
     string breakfast = 2;
     string lunch = 3;
-    string dinner = 4;
+    string snacks = 4;
+    string dinner = 5;
 }
 
 message SetTimeResponse {

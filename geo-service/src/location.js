@@ -31,7 +31,7 @@ const setLocation = async(call,cb)=>{
             }
             return cb(null, {
                 message: `Changed ${type === "home"?"":"patient"} location succesfully.`,
-                geo:updatedGeo,
+                geo:createdGeo,
             });
         }
         return cb(null, {

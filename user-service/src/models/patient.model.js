@@ -54,7 +54,20 @@ const patientSchema = new Schema(
         type: mongoose.Types.ObjectId,
         ref: "Room",
       }
-    }
+    },
+    speedDials:[
+      {
+        name:{
+          type:String,
+        },
+        phNo:{
+          type:String,
+        },
+        imageUrl:{
+          type:String,
+        }
+      }
+    ]
 
   },
   {

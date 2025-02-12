@@ -111,6 +111,26 @@ const getCaretaker = AsyncHandler(async(req,res)=>{
   })
 })
 
+const setSpeedDials = AsyncHandler(async(req,res)=>{
+  const {patientId} = req.params;
+  const {name1, name2, phNo1, phNo2, imageBase64_1, imageBase64_2} = req.body;
+  const setSpeedDialsRequest = { patientId, name1, name2, phNo1, phNo2, imageBase64_1, imageBase64_2 };
+  userClient.setSpeedDials(setSpeedDialsRequest,async(err,msg)=>{
+    if(err){
+          const response = await GrpcError(err);      
+          return res
+            .status(response.statusCode)
+            .json(
+              new ApiResponse(response.statusCode, undefined,response.message)
+            );
+    } else {
+          return res
+            .status(200)
+            .json(new ApiResponse(200, { success: msg.success }, msg.message));
+    }
+  })
+})
 
 
-export { registerCaretaker,registerPatientByCaretaker,loginCaretaker,getCaretaker };
+
+export { registerCaretaker,registerPatientByCaretaker,loginCaretaker,getCaretaker,setSpeedDials};

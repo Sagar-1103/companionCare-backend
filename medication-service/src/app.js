@@ -6,14 +6,25 @@ dotenv.config();
 
 const setTime = async(call,cb) =>{
     try {
-        const {patientId,breakfast,lunch,dinner} = call.request;
-        if(!patientId || !breakfast || !lunch || !dinner){
+        const {patientId,breakfast,lunch,snacks,dinner} = call.request;
+        if(!patientId || !breakfast || !lunch || !snacks || !dinner){
             return cb({
                 code: grpc.status.INVALID_ARGUMENT,
                 message: "Missing required fields.",
             },null);
         }
-        const timings = {breakfast,lunch,dinner};
+        const timings = {breakfast,lunch,snacks,dinner};
+
+        const existingTime = await Time.findOne({ patientId });
+
+        if (existingTime) {
+            existingTime.timings = timings;
+            await existingTime.save();
+            return cb(null, {
+                message: "Time slots updated successfully.",
+                time: existingTime,
+            });
+        }
         const createdTime = await Time.create({timings,patientId});
         if(!createdTime){
             return cb({
@@ -50,6 +61,9 @@ const setMedication = async(call,cb)=>{
         }
         if (timing==="lunch") {
             timer  = fetchedTime.timings.lunch;
+        }
+        if (timing==="snacks") {
+            timer  = fetchedTime.timings.snacks;
         }
         if (timing==="dinner") {
             timer  = fetchedTime.timings.dinner;

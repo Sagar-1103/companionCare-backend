@@ -110,6 +110,12 @@ message Disease {
     string diseaseId = 2; 
 }
 
+message SpeedDial {
+    string name = 1;
+    string phNo = 2;
+    string imageUrl = 3;
+}
+
 message Patient {
     string id = 1;
     string name = 2;
@@ -124,6 +130,7 @@ message Patient {
     string doctorId = 12;
     RoomIds roomIds = 13;
     repeated Disease diseases = 14;
+    repeated SpeedDial speedDials = 15;
 }
 
 message CreatePatientByCaretakerRequest {
@@ -252,6 +259,22 @@ message GetPatientsResponse {
     string message  = 2;
 }
 
+message SetSpeedDialsRequest {
+    string name1 = 1;
+    string name2 = 2;
+    string phNo1 = 3;
+    string phNo2 = 4;
+    bytes imageBase64_1 = 5;
+    bytes imageBase64_2 = 6;
+    string patientId = 7;
+}
+
+message SetSpeedDialsResponse {
+    bool success = 1;
+    string message = 2;
+}
+
+
 service UserService {
     rpc IsAuthenticated(IsAuthenticatedRequest) returns (IsAuthenticatedResponse) {};
     rpc LogoutUser(LogoutUserRequest) returns (LogoutUserResponse) {};
@@ -269,5 +292,6 @@ service UserService {
     rpc GetCurrentPatient(GetCurrentPatientRequest) returns (GetCurrentPatientResponse) {};
     rpc SetDiseases(SetDiseasesRequest) returns (SetDiseasesResponse) {};
     rpc GetPatients(GetPatientsRequest) returns (GetPatientsResponse) {};
+    rpc SetSpeedDials(SetSpeedDialsRequest) returns (SetSpeedDialsResponse) {};
 }
 

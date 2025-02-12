@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { logoutUser, setPatientDiseases } from "../controllers/user/user.controller.js";
-import { getCaretaker, loginCaretaker, registerCaretaker, registerPatientByCaretaker } from "../controllers/user/caretaker.controller.js";
+import { getCaretaker, loginCaretaker, registerCaretaker, registerPatientByCaretaker, setSpeedDials } from "../controllers/user/caretaker.controller.js";
 import { getDoctor, getDoctorsPatients, loginDoctor, pairPatientToDoctor, registerDoctor } from "../controllers/user/doctor.controller.js";
 import { getPatient, loginPatient, loginPatientOnCode, registerPatient } from "../controllers/user/patient.controller.js";
 
@@ -11,6 +11,7 @@ router.route("/register-caretaker").post(registerCaretaker);
 router.route("/register-patient-by-caretaker").post(registerPatientByCaretaker);
 router.route("/login-caretaker").post(loginCaretaker);                 
 router.route("/current-caretaker/:id").get(getCaretaker);                 
+router.route("/speed-dials/:patientId").post(setSpeedDials);                 
 
 //Doctor routes
 router.route("/register-doctor").post(registerDoctor);
