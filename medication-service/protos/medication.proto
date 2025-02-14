@@ -110,6 +110,16 @@ message GetHealthDetailsResponse {
     string message = 2;
 }
 
+message GetTimeRequest {
+    string patientId = 1;
+}
+
+message GetTimeResponse {
+    Time time = 1;
+    string message = 2;
+}
+
+
 service MedicationService {
     rpc SetTime(SetTimeRequest) returns (SetTimeResponse) {}
     rpc SetMedication(SetMedicationRequest) returns (SetMedicationResponse) {}
@@ -117,4 +127,5 @@ service MedicationService {
     rpc GetMedications(GetMedicationsRequest) returns (GetMedicationsResponse) {}
     rpc SetHealthDetails(SetHealthDetailsRequest) returns (SetHealthDetailsResponse) {}
     rpc GetHealthDetails(GetHealthDetailsRequest) returns (GetHealthDetailsResponse) {}
+    rpc GetTime(GetTimeRequest) returns (GetTimeResponse) {}
 }

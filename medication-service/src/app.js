@@ -56,6 +56,8 @@ const setMedication = async(call,cb)=>{
             },null);
         }
         const fetchedTime = await Time.findOne({patientId});
+        console.log(fetchedTime);
+        
         let timer;
         if (timing==="breakfast") {
             timer  = fetchedTime.timings.breakfast;
@@ -218,4 +220,33 @@ const getHealthDetails = async(call,cb)=>{
     }
 }
 
-export {setTime,setMedication,deleteMedication,getMedications,setHealthDetails,getHealthDetails};
+const getTime = async(call,cb)=>{
+    try {
+        const {patientId} = call.request;
+        if(!patientId){
+            return cb({
+                code: grpc.status.INVALID_ARGUMENT,
+                message: "Missing required fields.",
+            },null);
+        }
+        const fetchedTime = await Time.findOne({patientId});
+        if(!fetchedTime){
+            return cb({
+                code: grpc.status.NOT_FOUND,
+                message: "Couldnt fetching time details.",
+            },null);
+        }
+        return cb(null, {
+            message: "Time details fetched successfully.",
+            time:fetchedTime,
+        });
+    } catch (error) {
+        console.error("Error fetching time details:", error);
+        return cb({
+            code: grpc.status.INTERNAL,
+            message: "Internal Server Error: " + error.message,
+        });
+    }
+}
+
+export {setTime,setMedication,deleteMedication,getMedications,setHealthDetails,getHealthDetails,getTime};

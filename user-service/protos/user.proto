@@ -131,6 +131,7 @@ message Patient {
     RoomIds roomIds = 13;
     repeated Disease diseases = 14;
     repeated SpeedDial speedDials = 15;
+    string createdAt = 16;
 }
 
 message CreatePatientByCaretakerRequest {

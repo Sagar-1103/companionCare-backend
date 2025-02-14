@@ -39,6 +39,23 @@ const setTime = AsyncHandler(async(req,res)=>{
     })
 })
 
+const getTime = AsyncHandler(async(req,res)=>{
+    const {patientId} = req.params;
+    const getTimeRequest = {patientId};
+    medicationClient.getTime(getTimeRequest,async(err,msg)=>{
+        if (err) {
+            const response = await GrpcError(err);
+            return res
+                .status(response.statusCode)
+                .json(new ApiResponse(response.statusCode, undefined, response.message));
+        } else {
+            return res
+            .status(200)
+            .json(new ApiResponse(200, { time: msg.time }, msg.message));
+        }
+    })
+})
+
 const setMedication = AsyncHandler(async(req,res)=>{
     const {patientId} = req.params;
     const {medicineName,medicineType,medicineDosage,timing,medText,startDate,endDate,before,after} = req.body;
@@ -93,4 +110,4 @@ const getMedications = AsyncHandler(async(req,res)=>{
 
 
 
-export {setTime,setMedication,getMedications,deleteMedication};
+export {setTime,setMedication,getMedications,deleteMedication,getTime};

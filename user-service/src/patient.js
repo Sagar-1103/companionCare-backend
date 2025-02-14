@@ -246,6 +246,8 @@ const getCurrentPatient = async(call,cb)=>{
     console.log(fetchedUser);
     
     const fetchedPatient = await Patient.findOne({patientId:fetchedUser._id});
+    console.log(fetchedPatient);
+    
     tempUser.dob = fetchedPatient.dob;
     tempUser.name = fetchedPatient.name;
     tempUser.gender = fetchedPatient.gender;
@@ -254,6 +256,7 @@ const getCurrentPatient = async(call,cb)=>{
     tempUser.doctorId = fetchedPatient.doctorId;
     tempUser.roomIds = fetchedPatient.roomIds;
     tempUser.diseases = fetchedPatient.diseases;
+    tempUser.createdAt = fetchedPatient.createdAt;
     return cb(null, {
         message: "Current user fetched successfully.",
         patient:tempUser,
