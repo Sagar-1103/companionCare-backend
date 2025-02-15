@@ -65,7 +65,7 @@ const isPatientInSafeZone = async(call,cb)=>{
         },null);
     }
     const { homeLocation, patientLocation, radius } = patient;
-    if (!homeLocation || !patientLocation || !radius) {
+    if (!homeLocation || !patientLocation) {
         return cb({
             code: grpc.status.NOT_FOUND,
             message: "Missing location or radius data.",
