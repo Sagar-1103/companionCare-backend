@@ -21,7 +21,7 @@ const geoSchema = new Schema(
     },
     radius:{
       type:Number,
-      default:0
+      default:80
     },
     patientLocation:locationSchema,
     homeLocation: locationSchema,
