@@ -8,6 +8,7 @@ import chatRouter from "./src/routes/chat.routes.js";
 import medicationRouter from "./src/routes/medication.routes.js";
 import geoRouter from "./src/routes/geo.routes.js";
 import healthRouter from "./src/routes/health.routes.js";
+import reportRouter from "./src/routes/report.routes.js";
 
 const app = express();
 const PORT = process.env.PORT || 5001;
@@ -30,6 +31,7 @@ app.use("/chats",chatRouter);
 app.use("/medications",medicationRouter);
 app.use("/geolocation",geoRouter);
 app.use("/health",healthRouter);
+app.use("/reports",reportRouter);
 
 app.listen(PORT, () => {
     console.log(`Gateway Server Running on port ${PORT}`);

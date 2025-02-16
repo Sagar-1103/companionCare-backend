@@ -1,0 +1,45 @@
+syntax = "proto3";
+
+message Report {
+    string report = 1;
+    string name = 2;
+    string patientId = 3;
+    string doctorId = 4;
+}
+
+message StoreReportRequest {
+    string id = 1;
+    string name = 2;
+    string role = 3;
+    string baseImage = 4;
+}
+
+message StoreReportResponse {
+    Report report = 1;
+    string message = 2;
+}
+
+message GetReportForPatientRequest {
+    string patientId = 1;
+}
+
+message GetReportForPatientResponse {
+    repeated Report reports = 1;
+    string message = 2;
+}
+
+message GetReportForDoctorRequest {
+    string doctorId = 1;
+}
+
+message GetReportForDoctorResponse {
+    repeated Report reports = 1;
+    string message = 2;
+}
+
+
+service AiService {
+  rpc StoreReport(StoreReportRequest) returns (StoreReportResponse) {} ;
+  rpc GetReportForPatient(GetReportForPatientRequest) returns (GetReportForPatientResponse) {} ;
+  rpc GetReportForDoctor(GetReportForDoctorRequest) returns (GetReportForDoctorResponse) {} ;
+}
