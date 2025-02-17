@@ -37,9 +37,21 @@ message GetReportForDoctorResponse {
     string message = 2;
 }
 
+message GenerateReportRequest {
+    string patientName = 1;
+    string doctorId = 2;
+    string doctorName = 3;
+    string imageBase64 = 4;
+}
+
+message GenerateReportResponse {
+    Report report = 1;
+    string message = 2;
+}
 
 service AiService {
   rpc StoreReport(StoreReportRequest) returns (StoreReportResponse) {} ;
   rpc GetReportForPatient(GetReportForPatientRequest) returns (GetReportForPatientResponse) {} ;
   rpc GetReportForDoctor(GetReportForDoctorRequest) returns (GetReportForDoctorResponse) {} ;
+  rpc GenerateReport(GenerateReportRequest) returns (GenerateReportResponse) {} ;
 }

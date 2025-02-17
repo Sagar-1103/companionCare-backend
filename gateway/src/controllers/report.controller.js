@@ -37,6 +37,24 @@ const storeReports = AsyncHandler(async(req,res)=>{
     })
 })
 
+const generateReport = AsyncHandler(async(req,res)=>{
+  const {patientName, doctorId, doctorName, imageBase64} = req.body;
+  const generateReportRequest = {patientName, doctorId, doctorName, imageBase64};
+  reportClient.generateReport(generateReportRequest,async(err,msg)=>{
+      if (err) {
+          const response = await GrpcError(err);
+          return res
+              .status(response.statusCode)
+              .json(new ApiResponse(response.statusCode, undefined, response.message));
+      } else {
+          return res
+          .status(200)
+          .json(new ApiResponse(200, { report: msg.report }, msg.message));
+      }
+  })
+})
+
+
 const getReportForPatient = AsyncHandler(async(req,res)=>{
   const {patientId} = req.body;
   const getReportForPatientRequest = {patientId};
@@ -71,4 +89,4 @@ const getReportForDoctor = AsyncHandler(async(req,res)=>{
   })
 })
 
-export {storeReports,getReportForPatient,getReportForDoctor};
+export {storeReports,getReportForPatient,getReportForDoctor,generateReport};
