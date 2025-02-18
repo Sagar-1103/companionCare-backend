@@ -142,7 +142,7 @@ const updateLog = AsyncHandler(async(req,res)=>{
     })
 })
 const getLogs = AsyncHandler(async(req,res)=>{
-    const {patientId} = req.body;
+    const {patientId} = req.params;
     const getLogsRequest = {patientId};
     medicationClient.getLogs(getLogsRequest,async(err,msg)=>{
         if (err) {
