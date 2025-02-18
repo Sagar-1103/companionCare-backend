@@ -119,6 +119,44 @@ message GetTimeResponse {
     string message = 2;
 }
 
+message Log {
+  string patientId = 1;
+  string title = 2;
+  string description = 3;
+  string id = 4;
+}
+
+message SetLogRequest {
+    string patientId = 1;
+    string title = 2;
+    string description = 3;
+}
+
+message SetLogResponse {
+    string message = 1;
+    Log log = 2;
+}
+
+message GetLogsRequest {
+    string patientId = 1;
+}
+
+message GetLogsResponse {
+    string message = 1;
+    repeated Log logs = 2;
+}
+
+message UpdateLogRequest {
+    string id = 1;
+    string title = 2;
+    string description = 3;
+}
+
+message UpdateLogResponse {
+    string message = 1;
+    Log log = 2;
+}
+
 
 service MedicationService {
     rpc SetTime(SetTimeRequest) returns (SetTimeResponse) {}
@@ -128,4 +166,7 @@ service MedicationService {
     rpc SetHealthDetails(SetHealthDetailsRequest) returns (SetHealthDetailsResponse) {}
     rpc GetHealthDetails(GetHealthDetailsRequest) returns (GetHealthDetailsResponse) {}
     rpc GetTime(GetTimeRequest) returns (GetTimeResponse) {}
+    rpc SetLog(SetLogRequest) returns (SetLogResponse) {}
+    rpc GetLogs(GetLogsRequest) returns (GetLogsResponse) {}
+    rpc UpdateLog(UpdateLogRequest) returns (UpdateLogResponse) {}
 }

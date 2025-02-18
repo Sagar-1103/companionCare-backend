@@ -109,5 +109,55 @@ const getMedications = AsyncHandler(async(req,res)=>{
 })
 
 
+const setLog = AsyncHandler(async(req,res)=>{
+    const {patientId,title,description} = req.body;
+    const setLogRequest = {patientId,title,description};
+    medicationClient.setLog(setLogRequest,async(err,msg)=>{
+        if (err) {
+            const response = await GrpcError(err);
+            return res
+                .status(response.statusCode)
+                .json(new ApiResponse(response.statusCode, undefined, response.message));
+        } else {
+            return res
+            .status(200)
+            .json(new ApiResponse(200, { log: msg.log }, msg.message));
+        }
+    })
+})
+const updateLog = AsyncHandler(async(req,res)=>{
+    const {id,title,description} = req.body;
+    const updateLogRequest = {id,title,description};
+    medicationClient.updateLog(updateLogRequest,async(err,msg)=>{
+        if (err) {
+            const response = await GrpcError(err);
+            return res
+                .status(response.statusCode)
+                .json(new ApiResponse(response.statusCode, undefined, response.message));
+        } else {
+            return res
+            .status(200)
+            .json(new ApiResponse(200, { log: msg.log }, msg.message));
+        }
+    })
+})
+const getLogs = AsyncHandler(async(req,res)=>{
+    const {patientId} = req.body;
+    const getLogsRequest = {patientId};
+    medicationClient.getLogs(getLogsRequest,async(err,msg)=>{
+        if (err) {
+            const response = await GrpcError(err);
+            return res
+                .status(response.statusCode)
+                .json(new ApiResponse(response.statusCode, undefined, response.message));
+        } else {
+            return res
+            .status(200)
+            .json(new ApiResponse(200, { logs: msg.logs }, msg.message));
+        }
+    })
+})
 
-export {setTime,setMedication,getMedications,deleteMedication,getTime};
+
+
+export {setTime,setMedication,getMedications,deleteMedication,getTime,setLog,updateLog,getLogs};

@@ -1,7 +1,7 @@
 import { startGrpcServer, getGrpcServer } from "./grpc.js";
 import protoLoader from "@grpc/proto-loader";
 import grpc from "@grpc/grpc-js";
-import { deleteMedication, getHealthDetails, getMedications, getTime, setHealthDetails, setMedication, setTime } from "./src/app.js";
+import { deleteMedication, getHealthDetails, getLogs, getMedications, getTime, setHealthDetails, setLog, setMedication, setTime, updateLog } from "./src/app.js";
 const PROTO_PATH = "./protos/medication.proto";
 
 const packageDefinition = protoLoader.loadSync(PROTO_PATH, {
@@ -24,4 +24,7 @@ server.addService(medication_proto.MedicationService.service, {
   setHealthDetails,
   getHealthDetails,
   getTime,
+  setLog,
+  getLogs,
+  updateLog
 });

@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import { Time } from "./models/time.model.js";
 import { Medication } from "./models/medication.model.js";
 import { Health } from "./models/health.model.js";
+import {Log} from "./models/log.model.js";
 dotenv.config();
 
 const setTime = async(call,cb) =>{
@@ -249,4 +250,88 @@ const getTime = async(call,cb)=>{
     }
 }
 
-export {setTime,setMedication,deleteMedication,getMedications,setHealthDetails,getHealthDetails,getTime};
+const setLog = async(call,cb)=>{
+    try {
+        const {patientId,title,description} = call.request;
+        if(!patientId || !title || !description){
+            return cb({
+                code: grpc.status.INVALID_ARGUMENT,
+                message: "Missing required fields.",
+            },null);
+        }
+        const createdLog = await Log.create({patientId,title,description});
+        if(!createdLog){
+            return cb({
+                code: grpc.status.NOT_FOUND,
+                message: "Couldnt create log.",
+            },null);
+        }
+        return cb(null, {
+            message: "Log created successfully.",
+            log:createdLog,
+        });
+    } catch (error) {
+        console.error("Error setting log:", error);
+        return cb({
+            code: grpc.status.INTERNAL,
+            message: "Internal Server Error: " + error.message,
+        });
+    }
+}
+const getLogs = async(call,cb)=>{
+    try {
+        const {patientId} = call.request;
+        if(!patientId){
+            return cb({
+                code: grpc.status.INVALID_ARGUMENT,
+                message: "Missing required fields.",
+            },null);
+        }
+        const allLogs = await Log.find({patientId});
+        return cb(null, {
+            message: "Logs fetched successfully.",
+            logs:allLogs,
+        });
+        
+    } catch (error) {
+        console.error("Error setting log:", error);
+        return cb({
+            code: grpc.status.INTERNAL,
+            message: "Internal Server Error: " + error.message,
+        });
+    }
+}
+const updateLog = async(call,cb)=>{
+    try {
+        const { id, title, description } = call.request;
+        if(!id || !title || !description){
+            return cb({
+                code: grpc.status.INVALID_ARGUMENT,
+                message: "Missing required fields.",
+            },null);
+        }
+        const updatedLog = await Log.findByIdAndUpdate(
+            id,
+            { title, description },
+            { new: true }
+          );
+          if (!updatedLog) {
+            return cb({
+                code: grpc.status.NOT_FOUND,
+                message: "Couldnt update log.",
+            },null);
+          }
+          return cb(null, {
+            message: "Logs fetched successfully.",
+            log:updatedLog,
+        });
+    } catch (error) {
+        console.error("Error setting log:", error);
+        return cb({
+            code: grpc.status.INTERNAL,
+            message: "Internal Server Error: " + error.message,
+        });
+    }
+}
+
+export {setTime,setMedication,deleteMedication,getMedications,setHealthDetails,getHealthDetails,getTime,setLog,getLogs,updateLog};
